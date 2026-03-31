@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GitHub Copilot CLI — PM Onboarding</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #21262d;
+      --border: #30363d;
+      --accent: #238636;
+      --accent-hover: #2ea043;
+      --blue: #388bfd;
+      --purple: #bc8cff;
+      --yellow: #e3b341;
+      --red: #f85149;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: rgba(13,17,23,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 56px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .nav-logo svg { width: 28px; height: 28px; }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-badge {
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── PROGRESS BAR ── */
+    .progress-bar {
+      position: fixed;
+      top: 56px;
+      left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--blue));
+      transition: width 0.4s ease;
+      z-index: 99;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 140px 2rem 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -100px; left: 50%;
+      transform: translateX(-50%);
+      width: 700px; height: 700px;
+      background: radial-gradient(ellipse, rgba(35,134,54,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-eyebrow .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 1.2rem;
+      letter-spacing: -0.02em;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--accent), var(--blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto 2.5rem;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover { background: var(--border); transform: translateY(-1px); }
+
+    /* ── SECTION ── */
+    section {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 60px 2rem;
+    }
+
+    .section-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+
+    section h2 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    section > p {
+      color: var(--muted);
+      margin-bottom: 2.5rem;
+      font-size: 1rem;
+    }
+
+    /* ── CARDS ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .card-icon {
+      font-size: 1.8rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .card p {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ── STEPS ── */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .step {
+      display: flex;
+      gap: 1.5rem;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .step-connector {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .step-num {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+      flex-shrink: 0;
+      z-index: 1;
+    }
+
+    .step.active .step-num {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 0 0 4px rgba(35,134,54,0.2);
+    }
+
+    .step-line {
+      width: 2px;
+      flex: 1;
+      min-height: 20px;
+      background: var(--border);
+      margin: 4px 0;
+    }
+
+    .step:last-child .step-line { display: none; }
+
+    .step-body {
+      padding-bottom: 2rem;
+      flex: 1;
+    }
+
+    .step-body h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      padding-top: 0.5rem;
+    }
+
+    .step-body p {
+      font-size: 0.875rem;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+
+    /* ── TERMINAL ── */
+    .terminal {
+      background: #010409;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.82rem;
+    }
+
+    .terminal-bar {
+      background: var(--surface2);
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .term-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+    }
+
+    .term-dot.red { background: #ff5f57; }
+    .term-dot.yellow { background: #febc2e; }
+    .term-dot.green { background: #28c840; }
+
+    .terminal-bar span {
+      margin-left: auto;
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+
+    .terminal-body {
+      padding: 1.2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .t-line { display: flex; gap: 0.5rem; align-items: flex-start; }
+    .t-prompt { color: var(--accent); user-select: none; }
+    .t-cmd { color: #79c0ff; }
+    .t-out { color: var(--muted); padding-left: 1rem; }
+    .t-comment { color: #3d444d; font-style: italic; }
+    .t-highlight { color: var(--yellow); }
+
+    /* ── COMMAND TABLE ── */
+    .cmd-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    .cmd-table thead th {
+      text-align: left;
+      padding: 10px 14px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cmd-table tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+
+    .cmd-table tbody tr:hover { background: var(--surface2); }
+    .cmd-table tbody tr:last-child { border-bottom: none; }
+
+    .cmd-table td { padding: 12px 14px; vertical-align: top; }
+
+    .cmd-chip {
+      display: inline-block;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 2px 10px;
+      font-family: 'SF Mono', monospace;
+      font-size: 0.8rem;
+      color: #79c0ff;
+      white-space: nowrap;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+
+    .tag-pm { background: rgba(188,140,255,0.15); color: var(--purple); }
+    .tag-dev { background: rgba(56,139,253,0.15); color: var(--blue); }
+    .tag-all { background: rgba(35,134,54,0.15); color: var(--accent); }
+
+    /* ── USE CASES ── */
+    .usecase-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 7px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .tab-btn:hover:not(.active) {
+      border-color: var(--muted);
+      color: var(--text);
+    }
+
+    .usecase-content { display: none; }
+    .usecase-content.active { display: block; }
+
+    /* ── QUOTE ── */
+    .pm-quote {
+      background: var(--surface);
+      border-left: 4px solid var(--purple);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 1.5rem 2rem;
+      margin: 2rem 0;
+      font-style: italic;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .pm-quote strong { color: var(--text); font-style: normal; }
+
+    /* ── TIP BOX ── */
+    .tip-box {
+      background: rgba(35,134,54,0.08);
+      border: 1px solid rgba(35,134,54,0.3);
+      border-radius: var(--radius);
+      padding: 1rem 1.5rem;
+      font-size: 0.875rem;
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+
+    .tip-box .tip-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+
+    /* ── CHEATSHEET ── */
+    .cheatsheet {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .cheatsheet-header {
+      background: var(--surface2);
+      padding: 0.75rem 1.5rem;
+      font-weight: 700;
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    footer a { color: var(--blue); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ── DIVIDER ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0;
+    }
+
+    /* ── BADGE ── */
+    .section-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 2rem;
+    }
+
+    /* ── SCROLL ANIMATE ── */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* ── COPY BUTTON ── */
+    .copy-btn {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.72rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .copy-btn:hover { background: var(--border); color: var(--text); }
+    .terminal-wrapper { position: relative; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
+               0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13
+               -.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66
+               .07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15
+               -.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27
+               .68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12
+               .51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48
+               0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+    </svg>
+    GitHub Copilot CLI
+    <span class="nav-badge">PM Guide</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#what-is-it">What is it?</a></li>
+    <li><a href="#for-pms">For PMs</a></li>
+    <li><a href="#get-started">Get Started</a></li>
+    <li><a href="#commands">Commands</a></li>
+    <li><a href="#use-cases">Use Cases</a></li>
+  </ul>
+</nav>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">
+    <span class="dot"></span>
+    PM Onboarding — GitHub Copilot CLI
+  </div>
+  <h1>Your AI coding partner,<br /><span>right in the terminal</span></h1>
+  <p>You don't need to write code to get value from GitHub Copilot CLI. As a PM, this tool helps you move faster, understand your codebase, and work better with engineers.</p>
+  <div class="hero-cta">
+    <a href="#get-started" class="btn btn-primary">▶ &nbsp;Start Onboarding</a>
+    <a href="#use-cases" class="btn btn-secondary">💡 &nbsp;PM Use Cases</a>
+  </div>
+</div>
+
+<hr class="divider" />
+
+<!-- WHAT IS IT -->
+<section id="what-is-it" class="fade-in">
+  <div class="section-label">01 — Foundation</div>
+  <h2>What is GitHub Copilot CLI?</h2>
+  <p>Think of it as an AI developer sitting next to you — except it lives in your terminal and can actually make code changes on your behalf.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">🤖</div>
+      <h3>AI-powered assistant</h3>
+      <p>Powered by Claude (Sonnet) by default. Understands your codebase, answers questions, writes and edits code.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">💻</div>
+      <h3>Terminal-native</h3>
+      <p>Lives in your command line. No browser tab switching, no copy-pasting — it works directly where code lives.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔗</div>
+      <h3>GitHub-integrated</h3>
+      <p>Knows about your repos, PRs, issues, and branches. You can interact with GitHub workflows via plain English.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">👁️</div>
+      <h3>You stay in control</h3>
+      <p>Preview every action before it happens. Nothing is committed or changed without your explicit approval.</p>
+    </div>
+  </div>
+
+  <div class="pm-quote" style="margin-top: 2rem;">
+    "It's not about replacing engineers — it's about <strong>removing the communication lag</strong> between what PMs need to understand and what engineers need to explain."
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- FOR PMs -->
+<section id="for-pms" class="fade-in">
+  <div class="section-label">02 — Why it matters to you</div>
+  <h2>What's in it for a PM?</h2>
+  <p>You don't need to code. But the closer you are to the codebase, the faster you ship. Here's how Copilot CLI bridges that gap.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">🔍</div>
+      <h3>Understand the codebase</h3>
+      <p>Ask "How does authentication work?" and get a plain-English answer — without bothering your engineers.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📋</div>
+      <h3>Review PRs with context</h3>
+      <p>Use <code>/review</code> to get a code review summary before your team meeting. Know what changed and why it matters.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🚀</div>
+      <h3>Create repos & automate setup</h3>
+      <p>Spin up new projects via the GitHub API. Scaffold boilerplate. Reduce time from idea to first commit.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📊</div>
+      <h3>Research before planning</h3>
+      <p>Use <code>/research</code> to deep-dive into GitHub search and web sources — great for competitive analysis or technical scoping.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📝</div>
+      <h3>Document & share</h3>
+      <p>Use <code>/share</code> to export findings to a Gist or Markdown — share technical insights with non-technical stakeholders.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🗺️</div>
+      <h3>Plan before building</h3>
+      <p>Use Plan mode (<code>Shift+Tab</code>) to draft an implementation approach. Review it with engineers before any code is written.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- GET STARTED -->
+<section id="get-started" class="fade-in">
+  <div class="section-label">03 — Step-by-step</div>
+  <h2>Getting Started</h2>
+  <p>Follow these steps to go from zero to productive in under 10 minutes.</p>
+
+  <div class="steps">
+
+    <div class="step active" onclick="activateStep(this)">
+      <div class="step-connector">
+        <div class="step-num">1</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-body">
+        <h3>Install GitHub Copilot CLI</h3>
+        <p>Run the install script in your terminal. You'll need an active GitHub Copilot subscription.</p>
+        <div class="terminal-wrapper">
+          <div class="terminal">
+            <div class="terminal-bar">
+              <span class="term-dot red"></span>
+              <span class="term-dot yellow"></span>
+              <span class="term-dot green"></span>
+              <span>Terminal — Install</span>
+            </div>
+            <div class="terminal-body">
+              <div class="t-line"><span class="t-comment"># macOS / Linux</span></div>
+              <div class="t-line"><span class="t-prompt">$</span><span class="t-cmd"> curl -fsSL https://gh.io/copilot-install | bash</span></div>
+              <br/>
+              <div class="t-line"><span class="t-comment"># Or with Homebrew</span></div>
+              <div class="t-line"><span class="t-prompt">$</span><span class="t-cmd"> brew install copilot-cli</span></div>
+              <br/>
+              <div class="t-line"><span class="t-comment"># Windows (WinGet)</span></div>
+              <div class="t-line"><span class="t-prompt">$</span><span class="t-cmd"> winget install GitHub.Copilot</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" onclick="activateStep(this)">
+      <div class="step-connector">
+        <div class="step-num">2</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-body">
+        <h3>Log in to GitHub</h3>
+        <p>Launch Copilot CLI and authenticate with your GitHub account using the <code>/login</code> command.</p>
+        <div class="terminal">
+          <div class="terminal-bar">
+            <span class="term-dot red"></span><span class="term-dot yellow"></span><span class="term-dot green"></span>
+            <span>Terminal — Login</span>
+          </div>
+          <div class="terminal-body">
+            <div class="t-line"><span class="t-prompt">$</span><span class="t-cmd"> copilot</span></div>
+            <div class="t-line"><span class="t-out">🤖 Welcome to GitHub Copilot CLI!</span></div>
+            <br/>
+            <div class="t-line"><span class="t-prompt">></span><span class="t-cmd"> /login</span></div>
+            <div class="t-line"><span class="t-out">Opening browser for authentication...</span></div>
+            <div class="t-line"><span class="t-out t-highlight">✓ Logged in as @yourusername</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" onclick="activateStep(this)">
+      <div class="step-connector">
+        <div class="step-num">3</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-body">
+        <h3>Navigate to your project</h3>
+        <p>Open your terminal, <code>cd</code> into a project folder, then launch Copilot CLI. It will understand your codebase automatically.</p>
+        <div class="terminal">
+          <div class="terminal-bar">
+            <span class="term-dot red"></span><span class="term-dot yellow"></span><span class="term-dot green"></span>
+            <span>Terminal — Navigate</span>
+          </div>
+          <div class="terminal-body">
+            <div class="t-line"><span class="t-prompt">$</span><span class="t-cmd"> cd ~/projects/my-app</span></div>
+            <div class="t-line"><span class="t-prompt">$</span><span class="t-cmd"> copilot</span></div>
+            <div class="t-line"><span class="t-out">Working in: ~/projects/my-app</span></div>
+            <div class="t-line"><span class="t-out t-highlight">✓ Ready. Ask me anything about your code!</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" onclick="activateStep(this)">
+      <div class="step-connector">
+        <div class="step-num">4</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-body">
+        <h3>Ask your first question</h3>
+        <p>Just type in plain English. No special syntax needed. Try something relevant to your current sprint or product area.</p>
+        <div class="terminal">
+          <div class="terminal-bar">
+            <span class="term-dot red"></span><span class="term-dot yellow"></span><span class="term-dot green"></span>
+            <span>Terminal — First Query</span>
+          </div>
+          <div class="terminal-body">
+            <div class="t-line"><span class="t-prompt">></span><span class="t-cmd"> How does user authentication work in this codebase?</span></div>
+            <br/>
+            <div class="t-line"><span class="t-out">🤖 This app uses JWT-based auth. Here's the flow:</span></div>
+            <div class="t-line"><span class="t-out">   1. User submits credentials to /api/auth/login</span></div>
+            <div class="t-line"><span class="t-out">   2. Server validates and returns a signed JWT token</span></div>
+            <div class="t-line"><span class="t-out">   3. Token is stored in HttpOnly cookie for security</span></div>
+            <div class="t-line"><span class="t-out">   4. Each request validates token via middleware...</span></div>
+          </div>
+        </div>
+        <br/>
+        <div class="tip-box">
+          <span class="tip-icon">💡</span>
+          <div><strong>PM Tip:</strong> You can ask follow-up questions in the same session — Copilot CLI remembers the conversation context, just like chatting with a teammate.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" onclick="activateStep(this)">
+      <div class="step-connector">
+        <div class="step-num">5</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-body">
+        <h3>Try Plan Mode</h3>
+        <p>Press <kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-size:0.8rem;">Shift+Tab</kbd> to switch to Plan Mode — great for scoping work before handing off to engineers.</p>
+        <div class="terminal">
+          <div class="terminal-bar">
+            <span class="term-dot red"></span><span class="term-dot yellow"></span><span class="term-dot green"></span>
+            <span>Terminal — Plan Mode</span>
+          </div>
+          <div class="terminal-body">
+            <div class="t-line"><span class="t-out t-highlight">[ Plan Mode enabled — Shift+Tab to exit ]</span></div>
+            <br/>
+            <div class="t-line"><span class="t-prompt">></span><span class="t-cmd"> Add a feature to let users export their data as CSV</span></div>
+            <br/>
+            <div class="t-line"><span class="t-out">📋 Implementation Plan:</span></div>
+            <div class="t-line"><span class="t-out">   1. Add /api/export endpoint</span></div>
+            <div class="t-line"><span class="t-out">   2. Query user records from DB</span></div>
+            <div class="t-line"><span class="t-out">   3. Format as CSV using existing utils</span></div>
+            <div class="t-line"><span class="t-out">   4. Return with Content-Disposition header</span></div>
+            <div class="t-line"><span class="t-out">   Estimated complexity: Medium (2–3 days)</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- COMMANDS -->
+<section id="commands" class="fade-in">
+  <div class="section-label">04 — Quick Reference</div>
+  <h2>Commands for PMs</h2>
+  <p>The most useful slash commands and keyboard shortcuts, curated for product work.</p>
+
+  <div class="cheatsheet">
+    <div class="cheatsheet-header">⌨️ &nbsp;Slash Commands</div>
+    <table class="cmd-table">
+      <thead>
+        <tr>
+          <th>Command</th>
+          <th>What it does</th>
+          <th>Best for</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="cmd-chip">/plan</span></td>
+          <td>Create an implementation plan before any code is written</td>
+          <td><span class="tag tag-pm">PM</span></td>
+        </tr>
+        <tr>
+          <td><span class="cmd-chip">/review</span></td>
+          <td>Analyze recent code changes and surface what matters</td>
+          <td><span class="tag tag-pm">PM</span></td>
+        </tr>
+        <tr>
+          <td><span class="cmd-chip">/research</span></td>
+          <td>Deep research using GitHub search + web sources</td>
+          <td><span class="tag tag-pm">PM</span></td>
+        </tr>
+        <tr>
+          <td><span class="cmd-chip">/diff</span></td>
+          <td>Review changes in the current directory</td>
+          <td><span class="tag tag-all">All</span></td>
+        </tr>
+        <tr>
+          <td><span class="cmd-chip">/pr</span></td>
+          <td>Operate on pull requests for the current branch</td>
+          <td><span class="tag tag-all">All</span></td>
+        </tr>
+        <tr>
+          <td><span class="cmd-chip">/share</span></td>
+          <td>Export the session to a Gist or Markdown file</td>
+          <td><span class="tag tag-pm">PM</span></td>
+        </tr>
+        <tr>
+          <td><span class="cmd-chip">/model</span></td>
+          <td>Switch AI model (Claude Sonnet, GPT-5, etc.)</td>
+          <td><span class="tag tag-all">All</span></td>
+        </tr>
+        <tr>
+          <td><span class="cmd-chip">/delegate</span></td>
+          <td>Send task to GitHub Copilot Agent to create a PR</td>
+          <td><span class="tag tag-dev">Dev</span></td>
+        </tr>
+        <tr>
+          <td><span class="cmd-chip">/context</span></td>
+          <td>See how much of the conversation context is being used</td>
+          <td><span class="tag tag-all">All</span></td>
+        </tr>
+        <tr>
+          <td><span class="cmd-chip">/compact</span></td>
+          <td>Summarize conversation to free up context window</td>
+          <td><span class="tag tag-all">All</span></td>
+        </tr>
+        <tr>
+          <td><span class="cmd-chip">/help</span></td>
+          <td>Full list of all available commands</td>
+          <td><span class="tag tag-all">All</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <br />
+
+  <div class="cheatsheet">
+    <div class="cheatsheet-header">⌨️ &nbsp;Keyboard Shortcuts</div>
+    <table class="cmd-table">
+      <thead>
+        <tr>
+          <th>Shortcut</th>
+          <th>What it does</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="cmd-chip">Shift+Tab</span></td>
+          <td>Toggle between Interactive and Plan mode</td>
+        </tr>
+        <tr>
+          <td><span class="cmd-chip">↑ / ↓</span></td>
+          <td>Navigate command history</td>
+        </tr>
+        <tr>
+          <td><span class="cmd-chip">Ctrl+C</span></td>
+          <td>Cancel current operation or clear input</td>
+        </tr>
+        <tr>
+          <td><span class="cmd-chip">Ctrl+L</span></td>
+          <td>Clear the screen</td>
+        </tr>
+        <tr>
+          <td><span class="cmd-chip">Ctrl+D</span></td>
+          <td>Shut down the CLI</td>
+        </tr>
+        <tr>
+          <td><span class="cmd-chip">Esc</span></td>
+          <td>Cancel the current operation</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- USE CASES -->
+<section id="use-cases" class="fade-in">
+  <div class="section-label">05 — Real Scenarios</div>
+  <h2>PM Use Cases in Action</h2>
+  <p>Select a scenario to see exactly how you'd use Copilot CLI in your day-to-day product work.</p>
+
+  <div class="usecase-tabs">
+    <button class="tab-btn active" onclick="switchTab('sprint-prep')">📅 Sprint Prep</button>
+    <button class="tab-btn" onclick="switchTab('pr-review')">🔍 PR Review</button>
+    <button class="tab-btn" onclick="switchTab('research')">🔬 Research</button>
+    <button class="tab-btn" onclick="switchTab('stakeholders')">📢 Stakeholders</button>
+  </div>
+
+  <div id="sprint-prep" class="usecase-content active">
+    <div class="tip-box" style="margin-bottom:1rem;">
+      <span class="tip-icon">📅</span>
+      <div><strong>Scenario:</strong> It's Monday morning. You want to understand what's technically feasible for this sprint before planning the backlog.</div>
+    </div>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <span class="term-dot red"></span><span class="term-dot yellow"></span><span class="term-dot green"></span>
+        <span>Sprint Prep Session</span>
+      </div>
+      <div class="terminal-body">
+        <div class="t-line"><span class="t-prompt">></span><span class="t-cmd"> What's the current state of the notifications feature?</span></div>
+        <div class="t-line"><span class="t-out">🤖 Notifications are partially implemented. Email is done.</span></div>
+        <div class="t-line"><span class="t-out">   Push notifications are stubbed but not wired to providers yet.</span></div>
+        <br/>
+        <div class="t-line"><span class="t-prompt">></span><span class="t-cmd"> How long would it take to add Slack notifications?</span></div>
+        <div class="t-line"><span class="t-out">🤖 The webhook integration would take ~1 day. Auth config another half day.</span></div>
+        <div class="t-line"><span class="t-out">   Here's what would need to change: src/notifications/providers/...</span></div>
+        <br/>
+        <div class="t-line"><span class="t-prompt">></span><span class="t-cmd"> /plan Add Slack notification support</span></div>
+        <div class="t-line"><span class="t-out">📋 Plan saved. Review and share with your team before sprint kickoff.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="pr-review" class="usecase-content">
+    <div class="tip-box" style="margin-bottom:1rem;">
+      <span class="tip-icon">🔍</span>
+      <div><strong>Scenario:</strong> Your team opened a big PR. You want to understand what changed before the demo call.</div>
+    </div>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <span class="term-dot red"></span><span class="term-dot yellow"></span><span class="term-dot green"></span>
+        <span>PR Review Session</span>
+      </div>
+      <div class="terminal-body">
+        <div class="t-line"><span class="t-prompt">></span><span class="t-cmd"> /review</span></div>
+        <div class="t-line"><span class="t-out">🔍 Reviewing 47 changed files...</span></div>
+        <br/>
+        <div class="t-line"><span class="t-out">Key changes:</span></div>
+        <div class="t-line"><span class="t-out">  ✅ Auth flow simplified — removed 3 redundant API calls</span></div>
+        <div class="t-line"><span class="t-out">  ⚠️  New dependency added: stripe@14.0 (check licensing)</span></div>
+        <div class="t-line"><span class="t-out">  🐛 Potential issue: error not handled in checkout flow (line 203)</span></div>
+        <br/>
+        <div class="t-line"><span class="t-prompt">></span><span class="t-cmd"> Explain the checkout flow issue in plain English</span></div>
+        <div class="t-line"><span class="t-out">🤖 If a payment fails, the user sees a blank page instead of an error message.</span></div>
+        <div class="t-line"><span class="t-out">   This should be a blocker before releasing to production.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="research" class="usecase-content">
+    <div class="tip-box" style="margin-bottom:1rem;">
+      <span class="tip-icon">🔬</span>
+      <div><strong>Scenario:</strong> You're scoping a new feature. You want to understand how competitors implement it and what open-source options exist.</div>
+    </div>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <span class="term-dot red"></span><span class="term-dot yellow"></span><span class="term-dot green"></span>
+        <span>Research Session</span>
+      </div>
+      <div class="terminal-body">
+        <div class="t-line"><span class="t-prompt">></span><span class="t-cmd"> /research How do leading SaaS products handle real-time collaboration features?</span></div>
+        <div class="t-line"><span class="t-out">🔬 Searching GitHub and web sources...</span></div>
+        <br/>
+        <div class="t-line"><span class="t-out">📊 Research Summary:</span></div>
+        <div class="t-line"><span class="t-out">  • Most use WebSockets or SSE for real-time sync</span></div>
+        <div class="t-line"><span class="t-out">  • Top OSS options: Yjs, ShareDB, Liveblocks</span></div>
+        <div class="t-line"><span class="t-out">  • Figma uses operational transforms; Notion uses CRDTs</span></div>
+        <br/>
+        <div class="t-line"><span class="t-prompt">></span><span class="t-cmd"> /share Export this to a Gist for my team</span></div>
+        <div class="t-line"><span class="t-out t-highlight">✓ Shared: https://gist.github.com/you/abc123</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="stakeholders" class="usecase-content">
+    <div class="tip-box" style="margin-bottom:1rem;">
+      <span class="tip-icon">📢</span>
+      <div><strong>Scenario:</strong> You need to explain a technical decision to a non-technical executive. Use Copilot CLI to get the plain-English version.</div>
+    </div>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <span class="term-dot red"></span><span class="term-dot yellow"></span><span class="term-dot green"></span>
+        <span>Stakeholder Prep Session</span>
+      </div>
+      <div class="terminal-body">
+        <div class="t-line"><span class="t-prompt">></span><span class="t-cmd"> We're migrating from REST to GraphQL. Explain the business impact in simple terms.</span></div>
+        <br/>
+        <div class="t-line"><span class="t-out">🤖 Here's the executive summary:</span></div>
+        <div class="t-line"><span class="t-out">  Today: the app makes ~12 network calls to load the dashboard.</span></div>
+        <div class="t-line"><span class="t-out">  After migration: 1 call. Load time drops from ~3s to ~0.4s.</span></div>
+        <div class="t-line"><span class="t-out">  Impact: Higher retention, lower infra costs, faster feature releases.</span></div>
+        <div class="t-line"><span class="t-out">  Risk: ~2 sprint migration effort, feature freeze recommended.</span></div>
+        <br/>
+        <div class="t-line"><span class="t-prompt">></span><span class="t-cmd"> /share Export this as Markdown</span></div>
+        <div class="t-line"><span class="t-out t-highlight">✓ Saved to ~/Documents/graphql-migration-summary.md</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- FINAL TIPS -->
+<section class="fade-in">
+  <div class="section-label">06 — Pro Tips</div>
+  <h2>Tips to get the most out of it</h2>
+  <p>Quick wins for your first week using Copilot CLI as a PM.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">🗣️</div>
+      <h3>Talk like a human</h3>
+      <p>No jargon needed. "Why is the dashboard slow?" works just as well as any technical query.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📎</div>
+      <h3>Mention files with @</h3>
+      <p>Type <code>@filename</code> to include a specific file in your context. Great for asking about a specific config or component.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔄</div>
+      <h3>Keep conversations going</h3>
+      <p>Follow-up questions work. "Now explain just the payment part" after a broad answer drills into detail.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">⏪</div>
+      <h3>Undo with /rewind</h3>
+      <p>If Copilot makes a file change you didn't want, <code>/rewind</code> reverts it instantly. No risk of losing work.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🧠</div>
+      <h3>Use /compact regularly</h3>
+      <p>For long sessions, use <code>/compact</code> to summarize history and free up the context window.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔒</div>
+      <h3>You're always in control</h3>
+      <p>Copilot will ask before doing anything destructive. You approve every action — nothing happens behind the scenes.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<footer>
+  <p>Built for PMs by GitHub Copilot CLI &nbsp;·&nbsp; <a href="https://docs.github.com/copilot/concepts/agents/about-copilot-cli" target="_blank">Official Docs ↗</a> &nbsp;·&nbsp; <a href="https://github.com/github/copilot-cli/discussions" target="_blank">Community ↗</a></p>
+  <p style="margin-top:0.5rem; font-size:0.78rem;">Powered by Claude Sonnet 4.6 · GitHub Copilot CLI v1.0.14</p>
+</footer>
+
+<script>
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const scrollTop = document.documentElement.scrollTop;
+    const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const progress = (scrollTop / docHeight) * 100;
+    document.getElementById('progressBar').style.width = progress + '%';
+  });
+
+  // Scroll fade-in
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  // Step activation
+  function activateStep(el) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // Tab switching
+  function switchTab(id) {
+    document.querySelectorAll('.usecase-content').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  // Smooth scroll for nav links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+</script>
+</body>
+</html>
