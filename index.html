@@ -548,15 +548,6 @@
     .fade-in {
       opacity: 1;
       transform: none;
-      transition: opacity 0.5s ease, transform 0.5s ease;
-    }
-    .fade-in.hidden-init {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    .fade-in.visible {
-      opacity: 1;
-      transform: none;
     }
 
     /* ── COPY BUTTON ── */
@@ -1143,17 +1134,12 @@
     document.getElementById('progressBar').style.width = progress + '%';
   });
 
-  // Scroll fade-in
+  // Scroll fade-in (visual enhancement only — content always visible)
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(e => {
-      if (e.isIntersecting) e.target.classList.add('visible');
+      if (e.isIntersecting) e.target.style.transform = 'none';
     });
   }, { threshold: 0.1 });
-
-  document.querySelectorAll('.fade-in').forEach(el => {
-    el.classList.add('hidden-init');
-    observer.observe(el);
-  });
 
   // Step activation
   function activateStep(el) {
