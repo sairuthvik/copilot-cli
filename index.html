@@ -4,1453 +4,977 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GitHub Copilot CLI — PM Onboarding</title>
-  <meta name="description" content="A PM-friendly onboarding experience for GitHub Copilot CLI: what it is, why it matters, how to start, and what to try first." />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d1117'/%3E%3Cpath fill='%2322c55e' d='M32 10c12.15 0 22 9.85 22 22S44.15 54 32 54 10 44.15 10 32 19.85 10 32 10Zm0 8a14 14 0 1 0 0 28 14 14 0 0 0 0-28Z'/%3E%3Cpath fill='%237dd3fc' d='M32 22a10 10 0 1 1 0 20 10 10 0 0 1 0-20Z'/%3E%3C/svg%3E" />
   <style>
     :root {
-      --bg: #07111f;
-      --bg-2: #0b1627;
-      --surface: rgba(14, 23, 38, 0.78);
-      --surface-strong: rgba(17, 28, 46, 0.96);
-      --surface-soft: rgba(18, 31, 49, 0.62);
-      --border: rgba(148, 163, 184, 0.18);
-      --border-strong: rgba(125, 211, 252, 0.3);
-      --text: #edf4ff;
-      --muted: #9fb0c9;
-      --muted-2: #7e91ac;
-      --green: #22c55e;
-      --green-2: #4ade80;
-      --blue: #60a5fa;
-      --cyan: #7dd3fc;
-      --violet: #a78bfa;
-      --amber: #fbbf24;
-      --shadow: 0 24px 80px rgba(2, 8, 23, 0.45);
-      --radius-xl: 28px;
-      --radius-lg: 20px;
-      --radius-md: 14px;
-      --radius-sm: 12px;
-      --content: 1180px;
+      --bg: #f6f8fa;
+      --surface: #ffffff;
+      --border: #d0d7de;
+      --border-light: #e8ecf0;
+      --text: #1f2328;
+      --muted: #656d76;
+      --green: #1a7f37;
+      --green-light: #dafbe1;
+      --green-mid: #2da44e;
+      --blue: #0969da;
+      --blue-light: #ddf4ff;
+      --purple: #8250df;
+      --purple-light: #fbefff;
+      --orange: #bc4c00;
+      --orange-light: #fff1e5;
+      --yellow: #9a6700;
+      --yellow-light: #fff8c5;
+      --code-bg: #24292f;
+      --code-text: #e6edf3;
+      --radius: 8px;
+      --radius-lg: 12px;
+      --content: 800px;
+      --shadow: 0 1px 3px rgba(31,35,40,0.12), 0 8px 24px rgba(66,74,83,0.12);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     html { scroll-behavior: smooth; }
 
     body {
-      font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(34, 197, 94, 0.14), transparent 26%),
-        radial-gradient(circle at top right, rgba(96, 165, 250, 0.16), transparent 30%),
-        radial-gradient(circle at 20% 80%, rgba(167, 139, 250, 0.14), transparent 28%),
-        linear-gradient(180deg, var(--bg), var(--bg-2));
-      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      font-size: 15px;
       line-height: 1.6;
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background-image:
-        linear-gradient(rgba(125, 211, 252, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(125, 211, 252, 0.05) 1px, transparent 1px);
-      background-size: 40px 40px;
-      mask-image: radial-gradient(circle at center, black 30%, transparent 78%);
-      opacity: 0.22;
-    }
-
-    a { color: inherit; text-decoration: none; }
-    button { font: inherit; }
-    code, pre, kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-
-    .shell {
-      width: min(var(--content), calc(100% - 32px));
-      margin: 0 auto;
-    }
-
-    .ambient {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      overflow: hidden;
-      z-index: 0;
-    }
-
-    .orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(14px);
-      opacity: 0.25;
-      animation: float 14s ease-in-out infinite;
-    }
-
-    .orb.one {
-      width: 280px;
-      height: 280px;
-      background: rgba(34, 197, 94, 0.35);
-      top: 110px;
-      left: -70px;
-    }
-
-    .orb.two {
-      width: 240px;
-      height: 240px;
-      background: rgba(125, 211, 252, 0.28);
-      top: 90px;
-      right: -40px;
-      animation-delay: -4s;
-    }
-
-    .orb.three {
-      width: 220px;
-      height: 220px;
-      background: rgba(167, 139, 250, 0.24);
-      bottom: 120px;
-      left: 18%;
-      animation-delay: -8s;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0) translateX(0); }
-      50% { transform: translateY(-18px) translateX(12px); }
-    }
-
-    @keyframes pulseGlow {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.25); }
-      50% { box-shadow: 0 0 0 12px rgba(34, 197, 94, 0); }
-    }
-
-    @keyframes shimmer {
-      0% { transform: translateX(-120%); }
-      100% { transform: translateX(120%); }
-    }
-
-    @keyframes blink {
-      0%, 45% { opacity: 1; }
-      46%, 100% { opacity: 0; }
-    }
-
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      backdrop-filter: blur(20px);
-      background: rgba(7, 17, 31, 0.68);
-      border-bottom: 1px solid rgba(148, 163, 184, 0.08);
-    }
-
-    .topbar-inner {
-      width: min(var(--content), calc(100% - 24px));
-      margin: 0 auto;
-      padding: 14px 0;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      justify-content: space-between;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-
-    .brand-mark {
-      width: 40px;
-      height: 40px;
-      display: grid;
-      place-items: center;
-      border-radius: 14px;
-      background: linear-gradient(135deg, rgba(34, 197, 94, 0.22), rgba(96, 165, 250, 0.22));
-      border: 1px solid rgba(125, 211, 252, 0.24);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
-    }
-
-    .brand small {
-      display: block;
-      color: var(--muted-2);
-      font-weight: 600;
-      font-size: 0.78rem;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .nav-link {
-      padding: 10px 14px;
-      border-radius: 999px;
-      color: var(--muted);
-      font-size: 0.92rem;
-      transition: 180ms ease;
-      border: 1px solid transparent;
-    }
-
-    .nav-link:hover,
-    .nav-link.active {
       color: var(--text);
-      background: rgba(148, 163, 184, 0.08);
-      border-color: rgba(148, 163, 184, 0.12);
+      background: var(--bg);
     }
 
-    .progress-wrap {
-      height: 3px;
-      background: rgba(255,255,255,0.04);
-    }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 
-    .progress-bar {
-      height: 100%;
-      width: 0;
-      background: linear-gradient(90deg, var(--green), var(--cyan), var(--violet));
-      box-shadow: 0 0 24px rgba(125, 211, 252, 0.4);
-      transition: width 150ms ease;
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(246,248,250,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
     }
+    .nav-inner {
+      max-width: calc(var(--content) + 48px);
+      margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 52px;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 8px;
+      font-weight: 600; font-size: 14px; color: var(--text);
+    }
+    .nav-steps { display: flex; gap: 4px; flex-wrap: wrap; }
+    .nav-step {
+      font-size: 12px; padding: 4px 10px; border-radius: 20px;
+      color: var(--muted); cursor: pointer; border: 1px solid transparent;
+      transition: all 0.15s;
+    }
+    .nav-step:hover { color: var(--text); background: var(--border-light); }
+    .nav-step.active { color: var(--green); background: var(--green-light); border-color: rgba(26,127,55,0.2); font-weight: 500; }
 
+    /* HERO */
     .hero {
-      position: relative;
-      z-index: 1;
-      padding: 52px 0 36px;
-    }
-
-    .hero-grid {
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 28px;
-      align-items: stretch;
-    }
-
-    .hero-copy,
-    .hero-showcase,
-    .section-panel,
-    .metric-card,
-    .benefit-card,
-    .journey-card,
-    .command-card,
-    .scenario-shell,
-    .week-card,
-    .final-cta {
-      position: relative;
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(18px);
-      overflow: hidden;
-    }
-
-    .hero-copy::before,
-    .hero-showcase::before,
-    .section-panel::before,
-    .benefit-card::before,
-    .journey-card::before,
-    .command-card::before,
-    .scenario-shell::before,
-    .week-card::before,
-    .final-cta::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, rgba(255,255,255,0.06), transparent 22%);
-      pointer-events: none;
-    }
-
-    .hero-copy {
-      padding: 34px;
-      min-height: 100%;
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: rgba(18, 31, 49, 0.84);
-      border: 1px solid rgba(125, 211, 252, 0.18);
-      color: var(--muted);
-      font-size: 0.82rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      margin-bottom: 18px;
-    }
-
-    .eyebrow-dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, var(--green), var(--cyan));
-      animation: pulseGlow 2.2s ease infinite;
-    }
-
-    h1 {
-      font-size: clamp(2.8rem, 4.7vw, 4.6rem);
-      line-height: 0.97;
-      letter-spacing: -0.05em;
-      margin-bottom: 18px;
-      max-width: 11ch;
-    }
-
-    .hero-gradient {
-      background: linear-gradient(135deg, #ffffff, #bfe9ff 45%, #9ef5c3 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .hero-copy > p {
-      color: var(--muted);
-      font-size: 1.08rem;
-      max-width: 58ch;
-      margin-bottom: 26px;
-    }
-
-    .cta-row {
-      display: flex;
-      gap: 14px;
-      flex-wrap: wrap;
-      margin-bottom: 28px;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      min-height: 50px;
-      padding: 0 18px;
-      border-radius: 14px;
-      font-weight: 700;
-      border: 1px solid transparent;
-      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn:hover { transform: translateY(-2px); }
-
-    .btn-primary {
-      color: #04111e;
-      background: linear-gradient(135deg, var(--green-2), #a7f3d0);
-      box-shadow: 0 18px 40px rgba(34, 197, 94, 0.18);
-    }
-
-    .btn-primary::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent);
-      transform: translateX(-120%);
-      animation: shimmer 3.4s linear infinite;
-    }
-
-    .btn-secondary {
-      color: var(--text);
-      background: rgba(148, 163, 184, 0.06);
-      border-color: rgba(148, 163, 184, 0.14);
-    }
-
-    .trust-row {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .trust-pill {
-      padding: 14px 16px;
-      border-radius: 16px;
-      background: rgba(9, 17, 31, 0.4);
-      border: 1px solid rgba(148, 163, 184, 0.12);
-      color: var(--muted);
-      font-size: 0.92rem;
-    }
-
-    .trust-pill strong {
-      display: block;
-      color: var(--text);
-      font-size: 1rem;
-      margin-bottom: 4px;
-    }
-
-    .hero-showcase {
-      padding: 20px;
-      display: grid;
-      gap: 18px;
-      align-content: start;
-    }
-
-    .window-bar,
-    .terminal-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .window-dot,
-    .term-dot {
-      width: 11px;
-      height: 11px;
-      border-radius: 999px;
-    }
-
-    .dot-red { background: #ff5f57; }
-    .dot-yellow { background: #febc2e; }
-    .dot-green { background: #28c840; }
-
-    .showcase-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      color: var(--muted);
-      font-size: 0.86rem;
-      margin-bottom: 6px;
-    }
-
-    .terminal {
-      background: linear-gradient(180deg, rgba(1, 8, 19, 0.94), rgba(5, 12, 24, 0.96));
-      border: 1px solid rgba(125, 211, 252, 0.12);
-      border-radius: 22px;
-      overflow: hidden;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
-    }
-
-    .terminal-bar {
-      padding: 12px 14px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.08);
-      background: rgba(148, 163, 184, 0.03);
-    }
-
-    .terminal-bar span:last-child {
-      margin-left: auto;
-      color: var(--muted-2);
-      font-size: 0.78rem;
-    }
-
-    .terminal-body {
-      padding: 18px;
-      display: grid;
-      gap: 10px;
-      font-size: 0.89rem;
-    }
-
-    .line {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-    }
-
-    .prompt { color: var(--green-2); }
-    .cmd { color: #bce2ff; }
-    .out { color: var(--muted); }
-    .accent { color: #fde68a; }
-    .success { color: #86efac; }
-    .comment { color: #6f839f; }
-
-    .typing::after {
-      content: "_";
-      display: inline-block;
-      margin-left: 4px;
-      animation: blink 1s step-end infinite;
-      color: var(--green-2);
-    }
-
-    .quick-actions {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .quick-card {
-      padding: 14px;
-      border-radius: 18px;
-      background: rgba(9, 17, 31, 0.45);
-      border: 1px solid rgba(148, 163, 184, 0.1);
-      transition: transform 180ms ease, border-color 180ms ease;
-    }
-
-    .quick-card:hover {
-      transform: translateY(-3px);
-      border-color: rgba(125, 211, 252, 0.26);
-    }
-
-    .quick-card strong {
-      display: block;
-      margin-bottom: 4px;
-    }
-
-    .quick-card p {
-      color: var(--muted);
-      font-size: 0.88rem;
-    }
-
-    .hero-metrics {
-      margin-top: 18px;
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    .metric-card {
-      padding: 18px;
-      border-radius: 20px;
-    }
-
-    .metric-label {
-      color: var(--muted);
-      font-size: 0.82rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 10px;
-    }
-
-    .metric-value {
-      font-size: 1.7rem;
-      font-weight: 800;
-      letter-spacing: -0.04em;
-      margin-bottom: 8px;
-    }
-
-    .metric-card p {
-      color: var(--muted);
-      font-size: 0.92rem;
-    }
-
-    main {
-      position: relative;
-      z-index: 1;
-      padding-bottom: 60px;
-    }
-
-    section {
-      padding: 18px 0;
-      scroll-margin-top: 92px;
-    }
-
-    .section-panel {
-      padding: 34px;
-    }
-
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: end;
-      gap: 18px;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-    }
-
-    .kicker {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--cyan);
-      text-transform: uppercase;
-      font-size: 0.78rem;
-      letter-spacing: 0.1em;
-      font-weight: 800;
-      margin-bottom: 12px;
-    }
-
-    .kicker::before {
-      content: "";
-      width: 30px;
-      height: 1px;
-      background: linear-gradient(90deg, var(--green), var(--cyan));
-    }
-
-    h2 {
-      font-size: clamp(1.9rem, 3vw, 3rem);
-      line-height: 1.05;
-      letter-spacing: -0.04em;
-      margin-bottom: 10px;
-    }
-
-    .section-header p,
-    .section-intro {
-      color: var(--muted);
-      max-width: 64ch;
-    }
-
-    .benefits-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
-      margin-top: 10px;
-    }
-
-    .benefit-card,
-    .journey-card,
-    .command-card,
-    .week-card {
-      padding: 22px;
-      border-radius: 22px;
-      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
-    }
-
-    .benefit-card:hover,
-    .journey-card:hover,
-    .command-card:hover,
-    .week-card:hover {
-      transform: translateY(-4px);
-      border-color: rgba(125, 211, 252, 0.26);
-      background: rgba(16, 27, 43, 0.92);
-    }
-
-    .icon-chip {
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
-      display: grid;
-      place-items: center;
-      margin-bottom: 14px;
-      background: linear-gradient(135deg, rgba(34, 197, 94, 0.18), rgba(96, 165, 250, 0.18));
-      border: 1px solid rgba(125, 211, 252, 0.2);
-      font-size: 1.2rem;
-    }
-
-    .benefit-card h3,
-    .journey-card h3,
-    .command-card h3,
-    .week-card h3,
-    .scenario-meta h3 {
-      font-size: 1.08rem;
-      margin-bottom: 8px;
-      letter-spacing: -0.02em;
-    }
-
-    .benefit-card p,
-    .journey-card p,
-    .command-card p,
-    .week-card p,
-    .scenario-meta p,
-    .quote,
-    .mini-note {
-      color: var(--muted);
-      font-size: 0.94rem;
-    }
-
-    .quote {
-      margin-top: 18px;
-      padding: 18px 20px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, rgba(167, 139, 250, 0.1), rgba(125, 211, 252, 0.07));
-      border: 1px solid rgba(167, 139, 250, 0.18);
-      font-style: italic;
-    }
-
-    .quote strong { color: var(--text); font-style: normal; }
-
-    .journey-grid {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .step-number {
-      width: 34px;
-      height: 34px;
-      border-radius: 999px;
-      display: grid;
-      place-items: center;
-      margin-bottom: 14px;
-      color: #04111e;
-      font-weight: 800;
-      background: linear-gradient(135deg, #bef264, #7dd3fc);
-    }
-
-    .mini-terminal {
-      margin-top: 14px;
-      padding: 14px;
-      border-radius: 16px;
-      background: rgba(3, 10, 20, 0.78);
-      border: 1px solid rgba(148, 163, 184, 0.1);
-      font-size: 0.83rem;
-      color: #bddcff;
-      min-height: 98px;
-    }
-
-    .mini-terminal .comment { display: block; margin-bottom: 6px; }
-
-    .command-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .command-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 14px;
-      flex-wrap: wrap;
-    }
-
-    .cmd-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 12px;
-      border-radius: 999px;
-      background: rgba(125, 211, 252, 0.08);
-      color: #bfe7ff;
-      border: 1px solid rgba(125, 211, 252, 0.18);
-      font-size: 0.86rem;
-    }
-
-    .role-badge {
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      font-weight: 800;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      border: 1px solid transparent;
-    }
-
-    .role-pm {
-      color: #f0abfc;
-      background: rgba(217, 70, 239, 0.08);
-      border-color: rgba(217, 70, 239, 0.14);
-    }
-
-    .role-all {
-      color: #86efac;
-      background: rgba(34, 197, 94, 0.08);
-      border-color: rgba(34, 197, 94, 0.14);
-    }
-
-    .command-card ul {
-      list-style: none;
-      display: grid;
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .command-card li {
-      color: var(--muted);
-      padding-left: 16px;
-      position: relative;
-    }
-
-    .command-card li::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 10px;
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, var(--green), var(--cyan));
-    }
-
-    .scenario-shell {
-      padding: 28px;
-      display: grid;
-      grid-template-columns: 300px 1fr;
-      gap: 22px;
-      align-items: stretch;
-    }
-
-    .scenario-tabs {
-      display: grid;
-      gap: 12px;
-    }
-
-    .scenario-tab {
-      padding: 16px;
-      border-radius: 18px;
-      background: rgba(9, 17, 31, 0.48);
-      border: 1px solid rgba(148, 163, 184, 0.1);
-      color: var(--muted);
-      text-align: left;
-      cursor: pointer;
-      transition: transform 180ms ease, border-color 180ms ease, color 180ms ease, background 180ms ease;
-    }
-
-    .scenario-tab strong {
-      display: block;
-      color: var(--text);
-      margin-bottom: 4px;
-      font-size: 1rem;
-    }
-
-    .scenario-tab.active,
-    .scenario-tab:hover {
-      transform: translateX(4px);
-      color: var(--text);
-      border-color: rgba(125, 211, 252, 0.24);
-      background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(96, 165, 250, 0.08));
-    }
-
-    .scenario-panel { display: none; }
-    .scenario-panel.active { display: grid; gap: 14px; }
-
-    .scenario-meta {
-      padding: 18px;
-      border-radius: 18px;
-      background: rgba(9, 17, 31, 0.45);
-      border: 1px solid rgba(148, 163, 184, 0.1);
-    }
-
-    .week-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .week-card ol {
-      margin: 12px 0 0 18px;
-      color: var(--muted);
-      display: grid;
-      gap: 8px;
-    }
-
-    .final-cta {
-      margin-top: 18px;
-      padding: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-      flex-wrap: wrap;
-    }
-
-    .final-cta p { color: var(--muted); max-width: 60ch; }
-
+      border-bottom: 1px solid var(--border);
+      padding: 56px 24px 48px;
+    }
+    .hero-inner { max-width: var(--content); margin: 0 auto; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12px; font-weight: 500; color: var(--green);
+      background: var(--green-light); border: 1px solid rgba(26,127,55,0.25);
+      padding: 4px 10px; border-radius: 20px; margin-bottom: 20px;
+    }
+    .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+    .hero h1 {
+      font-size: 36px; font-weight: 700; line-height: 1.2;
+      letter-spacing: -0.5px; margin-bottom: 16px; color: var(--text);
+    }
+    .hero p {
+      font-size: 17px; color: var(--muted); max-width: 580px;
+      margin-bottom: 28px; line-height: 1.65;
+    }
+    .hero-meta { display: flex; gap: 24px; flex-wrap: wrap; }
+    .meta-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+
+    /* PROGRESS */
+    .progress-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+    }
+    .progress-inner {
+      max-width: var(--content); margin: 0 auto;
+      display: flex; position: relative;
+    }
+    .progress-step {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; gap: 6px; position: relative; cursor: pointer;
+    }
+    .progress-step:not(:last-child)::after {
+      content: ""; position: absolute; top: 14px;
+      left: 50%; right: -50%; height: 2px;
+      background: var(--border); z-index: 0;
+    }
+    .progress-step.done:not(:last-child)::after { background: var(--green); }
+    .step-dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--bg); border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 600; color: var(--muted);
+      z-index: 1; position: relative; transition: all 0.2s;
+    }
+    .progress-step.active .step-dot { background: var(--green); border-color: var(--green); color: white; }
+    .progress-step.done .step-dot { background: var(--green-light); border-color: var(--green); color: var(--green); }
+    .step-label { font-size: 11px; color: var(--muted); text-align: center; white-space: nowrap; }
+    .progress-step.active .step-label { color: var(--green); font-weight: 600; }
+
+    /* MAIN */
+    main { max-width: var(--content); margin: 0 auto; padding: 48px 24px 80px; }
+
+    /* SECTIONS */
+    .section { margin-bottom: 56px; }
+    .section-label {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 12px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--muted); margin-bottom: 20px;
+    }
+    .section-label::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+    .section h2 { font-size: 24px; font-weight: 700; margin-bottom: 10px; color: var(--text); }
+    .section > p { color: var(--muted); margin-bottom: 24px; font-size: 15px; }
+
+    /* CALLOUTS */
+    .callout {
+      border-radius: var(--radius); padding: 14px 16px; margin: 16px 0;
+      display: flex; gap: 12px; font-size: 14px; line-height: 1.55;
+    }
+    .callout-icon { flex-shrink: 0; font-size: 16px; line-height: 1.55; }
+    .callout.info { background: var(--blue-light); border: 1px solid rgba(9,105,218,0.2); }
+    .callout.tip { background: var(--green-light); border: 1px solid rgba(26,127,55,0.2); }
+    .callout.warn { background: var(--yellow-light); border: 1px solid rgba(154,103,0,0.2); }
+    .callout.help { background: var(--purple-light); border: 1px solid rgba(130,80,223,0.2); }
+
+    /* CODE */
+    .code-block { background: var(--code-bg); border-radius: var(--radius); overflow: hidden; margin: 12px 0; }
+    .code-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 14px; border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .code-lang { font-size: 11px; color: rgba(230,237,243,0.5); font-family: ui-monospace,monospace; text-transform: uppercase; letter-spacing: 0.05em; }
+    .copy-btn {
+      font-size: 11px; color: rgba(230,237,243,0.5); cursor: pointer;
+      background: none; border: 1px solid rgba(255,255,255,0.12); border-radius: 4px; padding: 2px 8px; transition: all 0.15s;
+    }
+    .copy-btn:hover { color: var(--code-text); border-color: rgba(255,255,255,0.3); }
+    pre { padding: 16px; overflow-x: auto; font-size: 13px; line-height: 1.7; color: var(--code-text); }
+    .cmd { color: #79c0ff; }
+    .comment { color: #8b949e; font-style: italic; }
+    .str { color: #a5d6ff; }
+    .prompt { color: #7ee787; user-select: none; }
+    .ic {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 85%; background: rgba(175,184,193,0.2);
+      border: 1px solid rgba(175,184,193,0.3);
+      border-radius: 4px; padding: 1px 5px;
+    }
+
+    /* STEP CARDS */
+    .steps { display: flex; flex-direction: column; gap: 4px; }
+    .step-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); overflow: hidden; transition: border-color 0.15s;
+    }
+    .step-card:hover { border-color: rgba(26,127,55,0.4); }
+    .step-header {
+      display: flex; align-items: flex-start; gap: 16px;
+      padding: 20px 24px; cursor: pointer;
+    }
+    .step-num {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--green-light); border: 2px solid rgba(26,127,55,0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: var(--green); flex-shrink: 0;
+    }
+    .step-title-area { flex: 1; }
+    .step-title { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
+    .step-subtitle { font-size: 13px; color: var(--muted); }
+    .step-chevron { color: var(--muted); transition: transform 0.2s; flex-shrink: 0; margin-top: 4px; }
+    .step-card.open .step-chevron { transform: rotate(90deg); }
+    .step-body { display: none; padding: 0 24px 24px 72px; }
+    .step-card.open .step-body { display: block; }
+
+    /* TABS */
+    .install-tabs {
+      display: flex; gap: 4px; margin-bottom: 0;
+      border-bottom: 1px solid var(--border); flex-wrap: wrap;
+    }
+    .itab {
+      font-size: 13px; font-weight: 500; padding: 8px 14px;
+      border-radius: 6px 6px 0 0; cursor: pointer; color: var(--muted);
+      border: 1px solid transparent; border-bottom: none; margin-bottom: -1px;
+      background: transparent; transition: all 0.15s;
+    }
+    .itab:hover { color: var(--text); }
+    .itab.active { color: var(--text); background: var(--surface); border-color: var(--border); font-weight: 600; }
+    .itab-panel { display: none; padding-top: 12px; }
+    .itab-panel.active { display: block; }
+
+    /* NOT INSTALLED */
+    .not-installed {
+      margin-top: 12px; padding: 12px 14px;
+      background: var(--purple-light); border: 1px solid rgba(130,80,223,0.2);
+      border-radius: var(--radius); font-size: 13px;
+    }
+    .not-installed summary {
+      cursor: pointer; font-weight: 600; color: var(--purple);
+      list-style: none; display: flex; align-items: center; gap: 6px;
+    }
+    .not-installed summary::-webkit-details-marker { display: none; }
+    .not-installed summary::before { content: "› "; font-size: 16px; }
+    .not-installed[open] summary::before { content: "↓ "; }
+    .not-installed ul { margin-top: 10px; padding-left: 16px; color: var(--text); line-height: 2; }
+    .not-installed ul li::marker { color: var(--purple); }
+
+    /* COMMAND CARDS */
+    .cmd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 600px) { .cmd-grid { grid-template-columns: 1fr; } }
+    .cmd-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 18px; transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .cmd-card:hover { border-color: rgba(9,105,218,0.4); box-shadow: var(--shadow); }
+    .cmd-card-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 6px; }
+    .cmd-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .cmd-card p { font-size: 13px; color: var(--muted); margin-bottom: 12px; line-height: 1.5; }
+    .cmd-card .code-block { margin: 0; }
+    .cmd-card pre { padding: 10px 14px; font-size: 12px; }
+    .cmd-example {
+      margin-top: 8px; font-size: 12px; color: var(--muted);
+      padding: 8px 12px; background: var(--bg); border-radius: 6px;
+      border: 1px solid var(--border-light); line-height: 1.7;
+    }
+
+    /* USE CASES */
+    .usecase-list { display: flex; flex-direction: column; gap: 12px; }
+    .usecase {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 20px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;
+    }
+    @media (max-width: 640px) { .usecase { grid-template-columns: 1fr; } }
+    .usecase-context h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .usecase-context p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    .usecase .code-block { margin: 0 0 6px; }
+    .usecase pre { padding: 10px 14px; font-size: 12px; }
+
+    /* CHEATSHEET */
+    .cheatsheet { background: var(--code-bg); border-radius: var(--radius-lg); overflow: hidden; }
+    .cheat-header {
+      padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.08);
+      font-size: 13px; font-weight: 600; color: rgba(230,237,243,0.7);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .cheat-body { padding: 8px 20px 16px; display: grid; gap: 0; }
+    .cheat-row {
+      display: grid; grid-template-columns: 260px 1fr; gap: 16px;
+      align-items: center; font-size: 13px;
+      padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .cheat-row:last-child { border-bottom: none; }
+    .cheat-cmd { color: #79c0ff; font-family: ui-monospace, SFMono-Regular, monospace; font-size: 12px; }
+    .cheat-desc { color: rgba(230,237,243,0.65); }
+
+    /* NEXT */
+    .next-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    @media (max-width: 640px) { .next-cards { grid-template-columns: 1fr; } }
+    .next-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 20px; transition: border-color 0.15s;
+    }
+    .next-card:hover { border-color: var(--green); }
+    .next-card-icon { font-size: 24px; margin-bottom: 10px; }
+    .next-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .next-card p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+    /* FOOTER */
     footer {
-      position: relative;
-      z-index: 1;
-      padding: 0 0 40px;
+      background: var(--surface); border-top: 1px solid var(--border);
+      padding: 24px; text-align: center; font-size: 13px; color: var(--muted);
     }
-
-    .footer-card {
-      width: min(var(--content), calc(100% - 32px));
-      margin: 0 auto;
-      padding: 18px 22px;
-      border-radius: 18px;
-      background: rgba(8, 15, 26, 0.72);
-      border: 1px solid rgba(148, 163, 184, 0.08);
-      color: var(--muted);
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .footer-card a { color: var(--cyan); }
-
-    @media (max-width: 1080px) {
-      .hero-grid,
-      .scenario-shell {
-        grid-template-columns: 1fr;
-      }
-
-      .benefits-grid,
-      .journey-grid,
-      .week-grid,
-      .hero-metrics,
-      .command-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 760px) {
-      .topbar-inner {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .nav-links { gap: 8px; }
-      .nav-link { padding: 8px 12px; }
-      .hero-copy,
-      .hero-showcase,
-      .section-panel,
-      .scenario-shell,
-      .final-cta { padding: 22px; }
-
-      h1 { max-width: none; }
-
-      .trust-row,
-      .benefits-grid,
-      .journey-grid,
-      .hero-metrics,
-      .command-grid,
-      .week-grid,
-      .quick-actions {
-        grid-template-columns: 1fr;
-      }
-
-      .section-header { align-items: flex-start; }
-      .final-cta { align-items: flex-start; }
-      .footer-card { flex-direction: column; }
-    }
+    footer a { color: var(--blue); }
   </style>
 </head>
 <body>
-  <div class="ambient" aria-hidden="true">
-    <div class="orb one"></div>
-    <div class="orb two"></div>
-    <div class="orb three"></div>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      Copilot CLI &middot; PM Guide
+    </div>
+    <div class="nav-steps">
+      <span class="nav-step active" onclick="jumpTo('what')">What is it</span>
+      <span class="nav-step" onclick="jumpTo('install')">Install</span>
+      <span class="nav-step" onclick="jumpTo('first-run')">First run</span>
+      <span class="nav-step" onclick="jumpTo('commands')">Commands</span>
+      <span class="nav-step" onclick="jumpTo('usecases')">For PMs</span>
+      <span class="nav-step" onclick="jumpTo('cheatsheet')">Cheatsheet</span>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="badge">PM-friendly guide</div>
+    <h1>GitHub Copilot CLI<br>from zero to useful</h1>
+    <p>A complete walkthrough for product managers &mdash; from installing the tool to running your first command and using it in your daily workflow. No engineering background needed.</p>
+    <div class="hero-meta">
+      <div class="meta-item">
+        <svg width="14" height="14" fill="none" stroke="#1a7f37" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        ~15 min to complete
+      </div>
+      <div class="meta-item">
+        <svg width="14" height="14" fill="none" stroke="#1a7f37" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        macOS &middot; Windows &middot; Linux
+      </div>
+      <div class="meta-item">
+        <svg width="14" height="14" fill="none" stroke="#1a7f37" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        No prior terminal experience needed
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="progress-bar">
+  <div class="progress-inner">
+    <div class="progress-step active" onclick="jumpTo('what')">
+      <div class="step-dot">1</div><div class="step-label">What is it</div>
+    </div>
+    <div class="progress-step" onclick="jumpTo('install')">
+      <div class="step-dot">2</div><div class="step-label">Install</div>
+    </div>
+    <div class="progress-step" onclick="jumpTo('first-run')">
+      <div class="step-dot">3</div><div class="step-label">First run</div>
+    </div>
+    <div class="progress-step" onclick="jumpTo('commands')">
+      <div class="step-dot">4</div><div class="step-label">Commands</div>
+    </div>
+    <div class="progress-step" onclick="jumpTo('usecases')">
+      <div class="step-dot">5</div><div class="step-label">For PMs</div>
+    </div>
+    <div class="progress-step" onclick="jumpTo('cheatsheet')">
+      <div class="step-dot">6</div><div class="step-label">Cheatsheet</div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+<!-- SECTION 1 -->
+<section class="section" id="what" data-prog="1">
+  <div class="section-label">Step 1 &middot; What is it</div>
+  <h2>GitHub Copilot CLI &mdash; in plain English</h2>
+  <p>You don&rsquo;t need to be an engineer to understand this. Here&rsquo;s the one-sentence version:</p>
+
+  <div class="callout tip">
+    <span class="callout-icon">&#128161;</span>
+    <div><strong>Copilot CLI</strong> is an AI assistant that lives in your terminal. You type a question in plain English and it writes the technical command for you &mdash; or explains one that your engineers sent you.</div>
   </div>
 
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true">✦</div>
-        <div>
-          GitHub Copilot CLI
-          <small>PM onboarding experience</small>
-        </div>
-      </div>
-      <nav class="nav-links" aria-label="Section navigation">
-        <a class="nav-link active" href="#overview">Overview</a>
-        <a class="nav-link" href="#value">PM value</a>
-        <a class="nav-link" href="#journey">First 10 min</a>
-        <a class="nav-link" href="#commands">What to type</a>
-        <a class="nav-link" href="#scenarios">Scenarios</a>
-      </nav>
+  <p style="margin-top:20px; margin-bottom:16px;">As a PM you&rsquo;ll use it for two things:</p>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;">
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px;">
+      <div style="font-size:24px; margin-bottom:8px;">&#128269;</div>
+      <strong style="font-size:15px;">Understand what&rsquo;s going on</strong>
+      <p style="font-size:13px; color:var(--muted); margin-top:4px; line-height:1.5;">Ask it to explain commands, error messages, or code your engineers shared. No more 20-minute Google sessions.</p>
     </div>
-    <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
-  </header>
-
-  <main>
-    <section id="overview" class="hero">
-      <div class="shell">
-        <div class="hero-grid">
-          <div class="hero-copy">
-            <div class="eyebrow"><span class="eyebrow-dot"></span>Designed for first-time PM users</div>
-            <h1>Learn Copilot CLI <span class="hero-gradient">without needing to be an engineer</span></h1>
-            <p>GitHub Copilot CLI can help you understand the codebase, scope work, review risky changes, and prep for stakeholder conversations — all from plain-English prompts inside the terminal.</p>
-            <div class="cta-row">
-              <a class="btn btn-primary" href="#journey">Start the 10-minute walkthrough</a>
-              <a class="btn btn-secondary" href="#scenarios">See PM use cases</a>
-            </div>
-            <div class="trust-row">
-              <div class="trust-pill">
-                <strong>No coding required</strong>
-                Ask natural-language questions and follow guided prompts.
-              </div>
-              <div class="trust-pill">
-                <strong>GitHub-native</strong>
-                Works with repos, PRs, issues, and your development workflow.
-              </div>
-              <div class="trust-pill">
-                <strong>Built for fast context</strong>
-                Get answers before standups, planning, reviews, and demos.
-              </div>
-            </div>
-          </div>
-
-          <div class="hero-showcase">
-            <div class="showcase-head">
-              <div class="window-bar">
-                <span class="window-dot dot-red"></span>
-                <span class="window-dot dot-yellow"></span>
-                <span class="window-dot dot-green"></span>
-              </div>
-              <span>Live PM workflow preview</span>
-            </div>
-
-            <div class="terminal">
-              <div class="terminal-bar">
-                <span class="term-dot dot-red"></span>
-                <span class="term-dot dot-yellow"></span>
-                <span class="term-dot dot-green"></span>
-                <span>copilot</span>
-              </div>
-              <div class="terminal-body">
-                <div class="line"><span class="prompt">&gt;</span><span class="cmd typing">What changed in the checkout PR and what should I worry about?</span></div>
-                <div class="line"><span class="out">Reviewing changed files, tests, and error handling paths...</span></div>
-                <div class="line"><span class="out">Key changes:</span></div>
-                <div class="line"><span class="out">• Checkout API is faster with fewer network calls</span></div>
-                <div class="line"><span class="out">• Stripe dependency was introduced for payment retries</span></div>
-                <div class="line"><span class="out accent">• Risk: failed payments may show a blank page instead of a friendly error</span></div>
-                <div class="line"><span class="out success">Suggested PM action: flag as release blocker before launch</span></div>
-              </div>
-            </div>
-
-            <div class="quick-actions">
-              <div class="quick-card">
-                <strong>/plan</strong>
-                <p>Turn a feature request into a delivery plan you can review with engineering.</p>
-              </div>
-              <div class="quick-card">
-                <strong>/review</strong>
-                <p>Get a fast, non-jargony summary of what matters in a PR.</p>
-              </div>
-              <div class="quick-card">
-                <strong>/research</strong>
-                <p>Compare implementation options using GitHub and web research.</p>
-              </div>
-              <div class="quick-card">
-                <strong>/share</strong>
-                <p>Export findings so stakeholders can consume the output quickly.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="hero-metrics" aria-label="Onboarding metrics">
-          <article class="metric-card">
-            <div class="metric-label">Time to first value</div>
-            <div class="metric-value">10 min</div>
-            <p>Enough to learn the workflow and ask useful questions in your own repo.</p>
-          </article>
-          <article class="metric-card">
-            <div class="metric-label">Best PM jobs</div>
-            <div class="metric-value">4</div>
-            <p>Understand code, scope work, review risks, and prepare stakeholder updates.</p>
-          </article>
-          <article class="metric-card">
-            <div class="metric-label">Good first prompts</div>
-            <div class="metric-value">12+</div>
-            <p>Start with prompts that sound like questions you already ask engineers.</p>
-          </article>
-          <article class="metric-card">
-            <div class="metric-label">Control level</div>
-            <div class="metric-value">High</div>
-            <p>You can inspect, review, and steer the flow rather than blindly trusting it.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="value">
-      <div class="shell section-panel">
-        <div class="section-header">
-          <div>
-            <div class="kicker">Why this matters</div>
-            <h2>What Copilot CLI actually unlocks for a PM</h2>
-            <p class="section-intro">This is not about writing production code yourself. It is about reducing the time it takes to turn technical uncertainty into product clarity.</p>
-          </div>
-        </div>
-
-        <div class="benefits-grid">
-          <article class="benefit-card">
-            <div class="icon-chip">🔎</div>
-            <h3>Understand the codebase faster</h3>
-            <p>Ask how auth, payments, exports, notifications, or feature flags work and get a concise explanation in plain English.</p>
-          </article>
-          <article class="benefit-card">
-            <div class="icon-chip">📋</div>
-            <h3>Review changes with confidence</h3>
-            <p>Before a demo or release call, use it to summarize what changed, what improved, and what looks risky.</p>
-          </article>
-          <article class="benefit-card">
-            <div class="icon-chip">🧭</div>
-            <h3>Scope before you commit</h3>
-            <p>Use planning mode to turn a product ask into a technical approach, dependencies, and likely impact areas.</p>
-          </article>
-          <article class="benefit-card">
-            <div class="icon-chip">📣</div>
-            <h3>Translate technical work for stakeholders</h3>
-            <p>Ask for business-language summaries so execs and non-technical partners can understand trade-offs and outcomes.</p>
-          </article>
-          <article class="benefit-card">
-            <div class="icon-chip">🚀</div>
-            <h3>Reduce back-and-forth with engineering</h3>
-            <p>Use it for first-pass answers so engineer time goes toward decisions, not repeated context-setting.</p>
-          </article>
-          <article class="benefit-card">
-            <div class="icon-chip">🧠</div>
-            <h3>Research implementation options</h3>
-            <p>Explore open-source patterns, competitor approaches, and likely stack implications before roadmap commitments.</p>
-          </article>
-        </div>
-
-        <div class="quote">“The real win is not that a PM can suddenly code. It is that a PM can <strong>ask better questions earlier</strong> and arrive in product conversations with context already loaded.”</div>
-      </div>
-    </section>
-
-    <section id="journey">
-      <div class="shell section-panel">
-        <div class="section-header">
-          <div>
-            <div class="kicker">Your first session</div>
-            <h2>A 10-minute path from zero to useful</h2>
-            <p class="section-intro">This is the onboarding flow I would recommend for any PM opening Copilot CLI for the first time.</p>
-          </div>
-        </div>
-
-        <div class="journey-grid">
-          <article class="journey-card">
-            <div class="step-number">1</div>
-            <h3>Open the CLI</h3>
-            <p>Launch Copilot in a project folder so it can orient itself around a real codebase and workflow.</p>
-            <div class="mini-terminal">
-              <span class="comment"># in your project folder</span>
-              <div>$ copilot</div>
-            </div>
-          </article>
-
-          <article class="journey-card">
-            <div class="step-number">2</div>
-            <h3>Authenticate once</h3>
-            <p>Use your GitHub login so the CLI can work with the repos and workflows you already use.</p>
-            <div class="mini-terminal">
-              <span class="comment"># first session</span>
-              <div>&gt; /login</div>
-              <div class="success">✓ logged in</div>
-            </div>
-          </article>
-
-          <article class="journey-card">
-            <div class="step-number">3</div>
-            <h3>Ask a discovery question</h3>
-            <p>Start with an area that matters to your roadmap so the value feels immediate and relevant.</p>
-            <div class="mini-terminal">
-              <span class="comment"># example</span>
-              <div>&gt; How does our notifications feature work today?</div>
-            </div>
-          </article>
-
-          <article class="journey-card">
-            <div class="step-number">4</div>
-            <h3>Try planning mode</h3>
-            <p>Use plan mode before asking for code. This is ideal for feature thinking, dependencies, and delivery conversations.</p>
-            <div class="mini-terminal">
-              <span class="comment"># switch modes</span>
-              <div><kbd>Shift+Tab</kbd></div>
-              <div>&gt; Add CSV export for user reports</div>
-            </div>
-          </article>
-
-          <article class="journey-card">
-            <div class="step-number">5</div>
-            <h3>Save or share the outcome</h3>
-            <p>Export the result so it can feed sprint planning, design reviews, or stakeholder updates.</p>
-            <div class="mini-terminal">
-              <span class="comment"># publish findings</span>
-              <div>&gt; /share</div>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="commands">
-      <div class="shell section-panel">
-        <div class="section-header">
-          <div>
-            <div class="kicker">What to type</div>
-            <h2>The command stack a PM will actually use</h2>
-            <p class="section-intro">Not every command matters equally. These are the ones most likely to create value in product planning, reviews, and cross-functional communication.</p>
-          </div>
-        </div>
-
-        <div class="command-grid">
-          <article class="command-card">
-            <div class="command-top">
-              <span class="cmd-chip">/plan</span>
-              <span class="role-badge role-pm">PM core</span>
-            </div>
-            <h3>Turn product asks into implementation plans</h3>
-            <p>Use this when you want to discuss approach and trade-offs before anyone starts coding.</p>
-            <ul>
-              <li>Best for feature scoping and engineering handoff prep</li>
-              <li>Use after pressing <kbd>Shift+Tab</kbd> to enter plan mode</li>
-              <li>Great prompt: “Add CSV export for account admins”</li>
-            </ul>
-          </article>
-
-          <article class="command-card">
-            <div class="command-top">
-              <span class="cmd-chip">/review</span>
-              <span class="role-badge role-pm">PM core</span>
-            </div>
-            <h3>Understand what changed in a PR</h3>
-            <p>Use it to identify user-facing impact, risk areas, and decision points before a release or demo.</p>
-            <ul>
-              <li>Best for release reviews and demo prep</li>
-              <li>Follow with: “Explain that in plain English”</li>
-              <li>Great prompt: “What should I worry about in this PR?”</li>
-            </ul>
-          </article>
-
-          <article class="command-card">
-            <div class="command-top">
-              <span class="cmd-chip">/research</span>
-              <span class="role-badge role-pm">PM core</span>
-            </div>
-            <h3>Research implementation patterns and options</h3>
-            <p>Use GitHub and web sources to frame discovery work and compare approaches before roadmap commitment.</p>
-            <ul>
-              <li>Best for exploratory product discovery</li>
-              <li>Helpful for build-vs-buy conversations</li>
-              <li>Great prompt: “How do SaaS products handle real-time collaboration?”</li>
-            </ul>
-          </article>
-
-          <article class="command-card">
-            <div class="command-top">
-              <span class="cmd-chip">/share</span>
-              <span class="role-badge role-all">Everyone</span>
-            </div>
-            <h3>Turn findings into something reusable</h3>
-            <p>Export key conclusions to Markdown or a Gist so the rest of the team can consume them without replaying the session.</p>
-            <ul>
-              <li>Best for sprint planning and stakeholder circulation</li>
-              <li>Pairs well with plans, research, and reviews</li>
-              <li>Great final step after a useful session</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="scenarios">
-      <div class="shell section-panel">
-        <div class="section-header">
-          <div>
-            <div class="kicker">Real workflows</div>
-            <h2>How PMs can use it day to day</h2>
-            <p class="section-intro">Think of these as reusable plays. Click through them like scenario cards rather than reading one long wall of text.</p>
-          </div>
-        </div>
-
-        <div class="scenario-shell">
-          <div class="scenario-tabs" role="tablist" aria-label="PM workflow scenarios">
-            <button class="scenario-tab active" data-target="scenario-sprint" role="tab" aria-selected="true">
-              <strong>Sprint prep</strong>
-              Clarify feasibility before backlog decisions.
-            </button>
-            <button class="scenario-tab" data-target="scenario-review" role="tab" aria-selected="false">
-              <strong>PR review</strong>
-              Understand user impact and shipping risk.
-            </button>
-            <button class="scenario-tab" data-target="scenario-research" role="tab" aria-selected="false">
-              <strong>Discovery research</strong>
-              Compare options before committing roadmap time.
-            </button>
-            <button class="scenario-tab" data-target="scenario-stakeholder" role="tab" aria-selected="false">
-              <strong>Stakeholder prep</strong>
-              Translate engineering work into business language.
-            </button>
-          </div>
-
-          <div>
-            <div class="scenario-panel active" id="scenario-sprint" role="tabpanel">
-              <div class="scenario-meta">
-                <h3>Use case: Monday morning sprint planning</h3>
-                <p>You want to know whether a feature is “close enough to real” to bring into the sprint and where delivery risk actually sits.</p>
-              </div>
-              <div class="terminal">
-                <div class="terminal-bar">
-                  <span class="term-dot dot-red"></span>
-                  <span class="term-dot dot-yellow"></span>
-                  <span class="term-dot dot-green"></span>
-                  <span>Sprint prep session</span>
-                </div>
-                <div class="terminal-body">
-                  <div class="line"><span class="prompt">&gt;</span><span class="cmd">What is the current state of notifications in this codebase?</span></div>
-                  <div class="line"><span class="out">Email notifications are implemented. Push notifications are scaffolded but not integrated with a provider.</span></div>
-                  <div class="line"><span class="prompt">&gt;</span><span class="cmd">How much work is Slack notification support?</span></div>
-                  <div class="line"><span class="out">Likely small-to-medium scope: provider integration, settings UI, and permission checks.</span></div>
-                  <div class="line"><span class="prompt">&gt;</span><span class="cmd">/plan Add Slack notification support</span></div>
-                  <div class="line"><span class="out success">Plan created: dependencies, likely files, rollout notes, and risk areas included.</span></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="scenario-panel" id="scenario-review" role="tabpanel">
-              <div class="scenario-meta">
-                <h3>Use case: PR review before a demo</h3>
-                <p>You do not need code-level mastery. You need to know what changed, what matters to users, and whether the story is safe to tell externally.</p>
-              </div>
-              <div class="terminal">
-                <div class="terminal-bar">
-                  <span class="term-dot dot-red"></span>
-                  <span class="term-dot dot-yellow"></span>
-                  <span class="term-dot dot-green"></span>
-                  <span>PR review session</span>
-                </div>
-                <div class="terminal-body">
-                  <div class="line"><span class="prompt">&gt;</span><span class="cmd">/review</span></div>
-                  <div class="line"><span class="out">Reviewing checkout changes, tests, dependency updates, and failure states...</span></div>
-                  <div class="line"><span class="out">Key improvements: faster checkout, cleaner request flow, fewer redundant API calls.</span></div>
-                  <div class="line"><span class="out accent">Potential issue: a failed payment can leave the user with no clear recovery path.</span></div>
-                  <div class="line"><span class="prompt">&gt;</span><span class="cmd">Explain that issue in plain English</span></div>
-                  <div class="line"><span class="out success">If payment fails, the user may see a broken experience instead of an actionable error message.</span></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="scenario-panel" id="scenario-research" role="tabpanel">
-              <div class="scenario-meta">
-                <h3>Use case: early discovery for a roadmap bet</h3>
-                <p>You want to explore solution patterns and likely implementation shapes before taking a recommendation into planning.</p>
-              </div>
-              <div class="terminal">
-                <div class="terminal-bar">
-                  <span class="term-dot dot-red"></span>
-                  <span class="term-dot dot-yellow"></span>
-                  <span class="term-dot dot-green"></span>
-                  <span>Discovery research session</span>
-                </div>
-                <div class="terminal-body">
-                  <div class="line"><span class="prompt">&gt;</span><span class="cmd">/research How do modern SaaS products implement collaborative editing?</span></div>
-                  <div class="line"><span class="out">Researching GitHub repos, implementation patterns, and web sources...</span></div>
-                  <div class="line"><span class="out">Common patterns: CRDTs, operational transforms, WebSocket synchronization.</span></div>
-                  <div class="line"><span class="out">Common tooling: Yjs, ShareDB, Liveblocks.</span></div>
-                  <div class="line"><span class="prompt">&gt;</span><span class="cmd">/share</span></div>
-                  <div class="line"><span class="out success">Summary exported for team discussion.</span></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="scenario-panel" id="scenario-stakeholder" role="tabpanel">
-              <div class="scenario-meta">
-                <h3>Use case: explain technical choices to business stakeholders</h3>
-                <p>This is where Copilot CLI becomes a translator: it can convert technical implementation into concise business impact.</p>
-              </div>
-              <div class="terminal">
-                <div class="terminal-bar">
-                  <span class="term-dot dot-red"></span>
-                  <span class="term-dot dot-yellow"></span>
-                  <span class="term-dot dot-green"></span>
-                  <span>Stakeholder prep session</span>
-                </div>
-                <div class="terminal-body">
-                  <div class="line"><span class="prompt">&gt;</span><span class="cmd">Explain our GraphQL migration in business terms</span></div>
-                  <div class="line"><span class="out">Today: the dashboard makes many network calls and loads slowly.</span></div>
-                  <div class="line"><span class="out">After migration: fewer round trips, faster dashboard loads, simpler feature delivery.</span></div>
-                  <div class="line"><span class="out">Impact: better user experience, improved retention potential, lower maintenance cost.</span></div>
-                  <div class="line"><span class="prompt">&gt;</span><span class="cmd">/share</span></div>
-                  <div class="line"><span class="out success">Executive summary exported.</span></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="week-one">
-      <div class="shell section-panel">
-        <div class="section-header">
-          <div>
-            <div class="kicker">Recommended ramp</div>
-            <h2>Your first-week PM playbook</h2>
-            <p class="section-intro">If you want a simple adoption plan, use this. It turns the CLI from “interesting tool” into a repeatable product habit.</p>
-          </div>
-        </div>
-
-        <div class="week-grid">
-          <article class="week-card">
-            <div class="icon-chip">Day 1</div>
-            <h3>Learn the shape of the tool</h3>
-            <p>Explore one repo, log in, and ask broad discovery questions about two product areas you already own.</p>
-            <ol>
-              <li>Ask how one major workflow works today</li>
-              <li>Try one follow-up question for more detail</li>
-              <li>Use <code>/share</code> to save a useful output</li>
-            </ol>
-          </article>
-
-          <article class="week-card">
-            <div class="icon-chip">Day 3</div>
-            <h3>Use it in a real product ritual</h3>
-            <p>Bring the CLI into sprint planning, a PR review, or a release check so the habit anchors to a real workflow.</p>
-            <ol>
-              <li>Use <code>/review</code> before a team call</li>
-              <li>Ask for risks in plain English</li>
-              <li>Compare the answer with the engineering story</li>
-            </ol>
-          </article>
-
-          <article class="week-card">
-            <div class="icon-chip">Day 5</div>
-            <h3>Use planning mode for real scope</h3>
-            <p>Before the next roadmap conversation, create one implementation plan so you can discuss dependencies before commitment.</p>
-            <ol>
-              <li>Switch to plan mode with <kbd>Shift+Tab</kbd></li>
-              <li>Describe a real feature ask</li>
-              <li>Review the plan with engineering</li>
-            </ol>
-          </article>
-        </div>
-
-        <div class="final-cta">
-          <div>
-            <h3>Best next prompt to try</h3>
-            <p>“I’m a PM. Explain the current onboarding flow in this codebase, what files own it, and what the riskiest part would be to change.”</p>
-          </div>
-          <a class="btn btn-primary" href="#overview">Back to top</a>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="footer-card">
-      <span>Built as a PM-friendly onboarding experience for GitHub Copilot CLI.</span>
-      <span><a href="https://docs.github.com/copilot/concepts/agents/about-copilot-cli" target="_blank" rel="noreferrer">Official docs</a> · <a href="https://github.com/sairuthvik/copilot-cli" target="_blank" rel="noreferrer">GitHub repo</a></span>
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px;">
+      <div style="font-size:24px; margin-bottom:8px;">&#9889;</div>
+      <strong style="font-size:15px;">Get things done faster</strong>
+      <p style="font-size:13px; color:var(--muted); margin-top:4px; line-height:1.5;">Generate commands to check logs, search repos, or run scripts without waiting for a teammate.</p>
     </div>
-  </footer>
+  </div>
 
-  <script>
-    const progressBar = document.getElementById('progressBar');
-    const navLinks = [...document.querySelectorAll('.nav-link')];
-    const sections = navLinks
-      .map(link => document.querySelector(link.getAttribute('href')))
-      .filter(Boolean);
+  <div class="callout info">
+    <span class="callout-icon">&#8505;&#65039;</span>
+    <div><strong>What it is NOT:</strong> it&rsquo;s not a chatbot in a browser tab. It runs in your computer&rsquo;s <em>terminal</em> (the black/white window with a blinking cursor). The next section walks you through opening one and getting set up.</div>
+  </div>
+</section>
 
-    const updateProgress = () => {
-      const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-      const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-      progressBar.style.width = progress + '%';
-    };
+<!-- SECTION 2 -->
+<section class="section" id="install" data-prog="2">
+  <div class="section-label">Step 2 &middot; Install</div>
+  <h2>Installing Copilot CLI</h2>
+  <p>Three things to install, in order. Each step tells you how to check if you already have it &mdash; so you won&rsquo;t repeat work you&rsquo;ve already done.</p>
 
-    const activateNav = () => {
-      const offset = window.scrollY + 140;
-      let currentId = sections[0]?.id;
-      sections.forEach(section => {
-        if (section.offsetTop <= offset) currentId = section.id;
+  <div class="steps">
+
+    <div class="step-card open" id="card-a">
+      <div class="step-header" onclick="toggleStep('card-a')">
+        <div class="step-num">A</div>
+        <div class="step-title-area">
+          <div class="step-title">Open your terminal</div>
+          <div class="step-subtitle">The text interface where you&rsquo;ll type commands</div>
+        </div>
+        <svg class="step-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="step-body">
+        <p style="font-size:14px; margin-bottom:12px;">Pick your operating system:</p>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:16px;">
+          <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:14px; text-align:center;">
+            <div style="font-size:22px; margin-bottom:6px;">&#127822;</div>
+            <div style="font-size:12px; font-weight:600; margin-bottom:4px;">macOS</div>
+            <div style="font-size:12px; color:var(--muted);">Press <span class="ic">&#8984; Space</span>, type <span class="ic">Terminal</span>, Enter</div>
+          </div>
+          <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:14px; text-align:center;">
+            <div style="font-size:22px; margin-bottom:6px;">&#129695;</div>
+            <div style="font-size:12px; font-weight:600; margin-bottom:4px;">Windows</div>
+            <div style="font-size:12px; color:var(--muted);">Press <span class="ic">Win + X</span>, choose <span class="ic">Terminal</span></div>
+          </div>
+          <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:14px; text-align:center;">
+            <div style="font-size:22px; margin-bottom:6px;">&#128039;</div>
+            <div style="font-size:12px; font-weight:600; margin-bottom:4px;">Linux</div>
+            <div style="font-size:12px; color:var(--muted);">Press <span class="ic">Ctrl + Alt + T</span></div>
+          </div>
+        </div>
+        <div class="callout tip">
+          <span class="callout-icon">&#9989;</span>
+          <div>You&rsquo;ll see a line ending in <span class="ic">$</span> or <span class="ic">%</span> or <span class="ic">&gt;</span>. That&rsquo;s the prompt &mdash; it means it&rsquo;s waiting for input. You&rsquo;re in the right place.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-card" id="card-b">
+      <div class="step-header" onclick="toggleStep('card-b')">
+        <div class="step-num">B</div>
+        <div class="step-title-area">
+          <div class="step-title">Install GitHub CLI (<span class="ic" style="font-size:13px;">gh</span>)</div>
+          <div class="step-subtitle">Copilot CLI runs as a plugin inside this &mdash; install it first</div>
+        </div>
+        <svg class="step-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="step-body">
+        <p style="font-size:14px; margin-bottom:10px;"><strong>First, check if you already have it:</strong></p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">terminal</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="prompt">$ </span><span class="cmd">gh --version</span></pre>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 0 20px;">
+          <div style="background:var(--green-light); border:1px solid rgba(26,127,55,0.2); border-radius:6px; padding:10px 12px; font-size:13px;">
+            <strong style="color:var(--green);">&#10003; See a version number?</strong><br>
+            <span style="color:var(--muted);">You already have it &mdash; skip to step C.</span>
+          </div>
+          <div style="background:var(--yellow-light); border:1px solid rgba(154,103,0,0.2); border-radius:6px; padding:10px 12px; font-size:13px;">
+            <strong style="color:var(--yellow);">&#10007; Says &ldquo;command not found&rdquo;?</strong><br>
+            <span style="color:var(--muted);">Follow the install options below.</span>
+          </div>
+        </div>
+
+        <p style="font-size:14px; margin-bottom:8px;"><strong>Install GitHub CLI &mdash; choose your method:</strong></p>
+        <div class="install-tabs">
+          <button class="itab active" onclick="switchTab(this,'tab-brew')">&#127822; macOS (Homebrew)</button>
+          <button class="itab" onclick="switchTab(this,'tab-win')">&#129695; Windows</button>
+          <button class="itab" onclick="switchTab(this,'tab-linux')">&#128039; Linux</button>
+          <button class="itab" onclick="switchTab(this,'tab-direct')">&#128230; Direct download</button>
+        </div>
+
+        <div id="tab-brew" class="itab-panel active">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">terminal</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="prompt">$ </span><span class="cmd">brew install gh</span></pre>
+          </div>
+          <details class="not-installed">
+            <summary>Don&rsquo;t have Homebrew installed?</summary>
+            <ul>
+              <li>Homebrew is a free package manager for macOS. Search <a href="https://www.google.com/search?q=how+to+install+homebrew+mac" target="_blank" style="color:var(--purple);">&ldquo;how to install Homebrew mac&rdquo;</a> on Google</li>
+              <li>Official site is <a href="https://brew.sh" target="_blank" style="color:var(--purple);">brew.sh</a> &mdash; copy the one-line install command from there</li>
+              <li>Or use the <strong>Direct download</strong> tab instead &mdash; no Homebrew needed</li>
+            </ul>
+          </details>
+        </div>
+
+        <div id="tab-win" class="itab-panel">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">powershell</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="comment"># Option 1: winget (built into Windows 10/11)</span>
+<span class="prompt">$ </span><span class="cmd">winget install --id GitHub.cli</span>
+
+<span class="comment"># Option 2: Chocolatey</span>
+<span class="prompt">$ </span><span class="cmd">choco install gh</span></pre>
+          </div>
+          <details class="not-installed">
+            <summary>Not sure which option to use?</summary>
+            <ul>
+              <li>Try <span class="ic">winget</span> first &mdash; it&rsquo;s pre-installed on most Windows 10/11 machines</li>
+              <li>If you see &ldquo;winget is not recognized&rdquo;, search <a href="https://www.google.com/search?q=how+to+install+GitHub+CLI+Windows" target="_blank" style="color:var(--purple);">&ldquo;how to install GitHub CLI Windows&rdquo;</a></li>
+              <li>Or use the <strong>Direct download</strong> tab &mdash; works on all platforms</li>
+            </ul>
+          </details>
+        </div>
+
+        <div id="tab-linux" class="itab-panel">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">terminal</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="comment"># Ubuntu / Debian</span>
+<span class="prompt">$ </span><span class="cmd">sudo apt install gh</span>
+
+<span class="comment"># Fedora / RHEL</span>
+<span class="prompt">$ </span><span class="cmd">sudo dnf install gh</span>
+
+<span class="comment"># Arch</span>
+<span class="prompt">$ </span><span class="cmd">sudo pacman -S github-cli</span></pre>
+          </div>
+          <details class="not-installed">
+            <summary>Distro not listed or getting errors?</summary>
+            <ul>
+              <li>Search <a href="https://www.google.com/search?q=install+GitHub+CLI+linux" target="_blank" style="color:var(--purple);">&ldquo;install GitHub CLI linux [your distro]&rdquo;</a> on Google</li>
+              <li>Official install page: <a href="https://cli.github.com" target="_blank" style="color:var(--purple);">cli.github.com</a></li>
+            </ul>
+          </details>
+        </div>
+
+        <div id="tab-direct" class="itab-panel">
+          <div class="callout info">
+            <span class="callout-icon">&#128229;</span>
+            <div>Go to <a href="https://cli.github.com" target="_blank"><strong>cli.github.com</strong></a> and download the installer for your OS. Works on all platforms with no package manager needed.</div>
+          </div>
+        </div>
+
+        <div class="callout tip" style="margin-top:16px;">
+          <span class="callout-icon">&#9989;</span>
+          <div>After installing, run <span class="ic">gh --version</span> again. You should see <span class="ic">gh version 2.x.x</span>. That means it worked.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-card" id="card-c">
+      <div class="step-header" onclick="toggleStep('card-c')">
+        <div class="step-num">C</div>
+        <div class="step-title-area">
+          <div class="step-title">Install the Copilot extension</div>
+          <div class="step-subtitle">One command &mdash; plugs Copilot into the GitHub CLI you just installed</div>
+        </div>
+        <svg class="step-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="step-body">
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">terminal</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="prompt">$ </span><span class="cmd">gh extension install github/gh-copilot</span></pre>
+        </div>
+        <div class="callout tip" style="margin-top:10px;">
+          <span class="callout-icon">&#9989;</span>
+          <div>Verify with <span class="ic">gh copilot --version</span>. If you see a version number, you&rsquo;re good to go.</div>
+        </div>
+        <div class="callout warn" style="margin-top:8px;">
+          <span class="callout-icon">&#9888;&#65039;</span>
+          <div>If it says <em>&ldquo;gh: command not found&rdquo;</em>, go back to step B &mdash; the GitHub CLI wasn&rsquo;t installed successfully yet.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-card" id="card-d">
+      <div class="step-header" onclick="toggleStep('card-d')">
+        <div class="step-num">D</div>
+        <div class="step-title-area">
+          <div class="step-title">Log in to GitHub</div>
+          <div class="step-subtitle">Connects the CLI to your GitHub account and activates Copilot</div>
+        </div>
+        <svg class="step-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="step-body">
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">terminal</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="prompt">$ </span><span class="cmd">gh auth login</span></pre>
+        </div>
+        <p style="font-size:14px; margin:12px 0 8px;">It&rsquo;ll ask a few questions. Choose these answers:</p>
+        <div style="background:var(--code-bg); border-radius:var(--radius); padding:16px; font-size:13px; font-family:ui-monospace,monospace; line-height:2.2;">
+          <div><span style="color:#8b949e;">? Where do you use GitHub?</span> &nbsp;<span style="color:#7ee787;">&#10003; GitHub.com</span></div>
+          <div><span style="color:#8b949e;">? What is your preferred protocol?</span> &nbsp;<span style="color:#7ee787;">&#10003; HTTPS</span></div>
+          <div><span style="color:#8b949e;">? How would you like to authenticate?</span> &nbsp;<span style="color:#7ee787;">&#10003; Login with a web browser</span></div>
+        </div>
+        <p style="font-size:13px; color:var(--muted); margin-top:10px;">A browser window opens. Log in with your GitHub account. Come back to the terminal when done.</p>
+        <div class="callout tip" style="margin-top:10px;">
+          <span class="callout-icon">&#9989;</span>
+          <div>Run <span class="ic">gh auth status</span> &mdash; you should see <em>&ldquo;Logged in to github.com&rdquo;</em> with your username.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="callout tip" style="margin-top:20px;">
+    <span class="callout-icon">&#127881;</span>
+    <div><strong>Done with install?</strong> You only ever need to do this once. From now on, Copilot CLI is available every time you open a terminal.</div>
+  </div>
+</section>
+
+<!-- SECTION 3 -->
+<section class="section" id="first-run" data-prog="3">
+  <div class="section-label">Step 3 &middot; First run</div>
+  <h2>Your first 5 minutes with Copilot CLI</h2>
+  <p>Open a fresh terminal and try these in order. This is your &ldquo;hello world&rdquo; moment.</p>
+
+  <div class="steps">
+    <div class="step-card open" id="card-fr1">
+      <div class="step-header" onclick="toggleStep('card-fr1')">
+        <div class="step-num">1</div>
+        <div class="step-title-area">
+          <div class="step-title">Ask your first question</div>
+          <div class="step-subtitle">Use <span class="ic">gh copilot suggest</span> to get a command from plain English</div>
+        </div>
+        <svg class="step-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="step-body">
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">terminal</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="prompt">$ </span><span class="cmd">gh copilot suggest</span> <span class="str">"list all files in the current folder"</span></pre>
+        </div>
+        <p style="font-size:14px; color:var(--muted); margin:10px 0;">Copilot responds with the command, then asks if you want to run it, copy it, or explain it first.</p>
+        <div class="callout tip">
+          <span class="callout-icon">&#128161;</span>
+          <div>You can type anything in plain English. Try <em>&ldquo;show me recent git commits&rdquo;</em> or <em>&ldquo;find all .log files&rdquo;</em>. There&rsquo;s no wrong phrasing.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-card" id="card-fr2">
+      <div class="step-header" onclick="toggleStep('card-fr2')">
+        <div class="step-num">2</div>
+        <div class="step-title-area">
+          <div class="step-title">Explain a command you&rsquo;ve seen</div>
+          <div class="step-subtitle">Paste any scary-looking command and get a plain English breakdown</div>
+        </div>
+        <svg class="step-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="step-body">
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">terminal</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="prompt">$ </span><span class="cmd">gh copilot explain</span> <span class="str">"git rebase -i HEAD~3"</span></pre>
+        </div>
+        <p style="font-size:14px; color:var(--muted); margin:10px 0;">Great for reviewing pull requests or understanding what a script does before you share it with stakeholders.</p>
+      </div>
+    </div>
+
+    <div class="step-card" id="card-fr3">
+      <div class="step-header" onclick="toggleStep('card-fr3')">
+        <div class="step-num">3</div>
+        <div class="step-title-area">
+          <div class="step-title">Set up a shortcut <span style="font-size:12px; color:var(--muted); font-weight:400;">(optional but recommended)</span></div>
+          <div class="step-subtitle">Type <span class="ic">??</span> instead of <span class="ic">gh copilot suggest</span> every time</div>
+        </div>
+        <svg class="step-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="step-body">
+        <div class="install-tabs">
+          <button class="itab active" onclick="switchTab(this,'alias-bash')">bash / zsh (macOS &amp; Linux)</button>
+          <button class="itab" onclick="switchTab(this,'alias-win')">Windows PowerShell</button>
+        </div>
+        <div id="alias-bash" class="itab-panel active">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">terminal</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="comment"># Run once to activate the shortcut</span>
+<span class="prompt">$ </span><span class="cmd">eval "$(gh copilot alias -- bash)"</span>  <span class="comment"># swap bash for zsh if needed</span>
+
+<span class="comment"># Now use ?? instead of gh copilot suggest</span>
+<span class="prompt">$ </span><span class="cmd">??</span> <span class="str">"show disk usage"</span></pre>
+          </div>
+          <div class="callout warn">
+            <span class="callout-icon">&#9888;&#65039;</span>
+            <div>This shortcut resets when you close the terminal. To make it permanent, add the <span class="ic">eval</span> line to your <span class="ic">~/.zshrc</span> (or <span class="ic">~/.bashrc</span>) file. Not sure how? Search <a href="https://www.google.com/search?q=how+to+add+alias+to+zshrc" target="_blank">&ldquo;how to add alias to zshrc&rdquo;</a>.</div>
+          </div>
+        </div>
+        <div id="alias-win" class="itab-panel">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">powershell</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="prompt">$ </span><span class="cmd">gh copilot alias -- powershell | Invoke-Expression</span>
+
+<span class="comment"># Then:</span>
+<span class="prompt">$ </span><span class="cmd">??</span> <span class="str">"show disk usage"</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 4 -->
+<section class="section" id="commands" data-prog="4">
+  <div class="section-label">Step 4 &middot; Commands</div>
+  <h2>The two commands you&rsquo;ll use 90% of the time</h2>
+  <p>Copilot CLI has two core commands. Here&rsquo;s what they do and when to reach for each one.</p>
+
+  <div class="cmd-grid">
+    <div class="cmd-card">
+      <div class="cmd-card-label">Command 1</div>
+      <h3>gh copilot suggest</h3>
+      <p>Describe what you want to do. Get back a command you can run or copy.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">terminal</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="prompt">$ </span><span class="cmd">gh copilot suggest</span> <span class="str">"..."</span></pre>
+      </div>
+      <div class="cmd-example">
+        <strong style="color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.05em;">Try asking</strong><br>
+        &rarr; &ldquo;find all TODO comments in a project&rdquo;<br>
+        &rarr; &ldquo;show which process is using port 3000&rdquo;<br>
+        &rarr; &ldquo;compress a folder into a zip file&rdquo;
+      </div>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-card-label">Command 2</div>
+      <h3>gh copilot explain</h3>
+      <p>Paste any command or error message. Get a plain English explanation.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">terminal</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="prompt">$ </span><span class="cmd">gh copilot explain</span> <span class="str">"..."</span></pre>
+      </div>
+      <div class="cmd-example">
+        <strong style="color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.05em;">Try pasting</strong><br>
+        &rarr; <span style="font-size:11px; font-family:monospace;">curl -X POST -H 'Content-Type: application/json'</span><br>
+        &rarr; <span style="font-size:11px; font-family:monospace;">EACCES: permission denied, open '/etc/hosts'</span><br>
+        &rarr; <span style="font-size:11px; font-family:monospace;">kubectl rollout restart deployment/api</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:20px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px;">
+    <h3 style="font-size:15px; margin-bottom:14px;">The interactive menu &mdash; what your choices mean</h3>
+    <div style="font-size:13px; display:grid; gap:8px;">
+      <div style="display:flex; align-items:flex-start; gap:10px; padding:8px; background:var(--bg); border-radius:6px;">
+        <span style="background:var(--green-light); color:var(--green); font-weight:600; padding:2px 10px; border-radius:4px; font-size:12px; flex-shrink:0; white-space:nowrap;">Run this command</span>
+        <span style="color:var(--muted);">Executes it immediately in your terminal</span>
+      </div>
+      <div style="display:flex; align-items:flex-start; gap:10px; padding:8px; background:var(--bg); border-radius:6px;">
+        <span style="background:var(--blue-light); color:var(--blue); font-weight:600; padding:2px 10px; border-radius:4px; font-size:12px; flex-shrink:0; white-space:nowrap;">Copy to clipboard</span>
+        <span style="color:var(--muted);">Copies it so you can paste it elsewhere (Slack, a doc, etc.)</span>
+      </div>
+      <div style="display:flex; align-items:flex-start; gap:10px; padding:8px; background:var(--bg); border-radius:6px;">
+        <span style="background:var(--purple-light); color:var(--purple); font-weight:600; padding:2px 10px; border-radius:4px; font-size:12px; flex-shrink:0; white-space:nowrap;">Explain this command</span>
+        <span style="color:var(--muted);">Breaks it down before you commit to running it &mdash; use this when unsure</span>
+      </div>
+      <div style="display:flex; align-items:flex-start; gap:10px; padding:8px; background:var(--bg); border-radius:6px;">
+        <span style="background:var(--orange-light); color:var(--orange); font-weight:600; padding:2px 10px; border-radius:4px; font-size:12px; flex-shrink:0; white-space:nowrap;">Revise the command</span>
+        <span style="color:var(--muted);">Add more context to refine what Copilot suggests</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 5 -->
+<section class="section" id="usecases" data-prog="5">
+  <div class="section-label">Step 5 &middot; For PMs</div>
+  <h2>Real PM scenarios &mdash; what to actually ask</h2>
+  <p>These are the situations PMs run into every week. Copy and adapt the prompts for your team&rsquo;s context.</p>
+
+  <div class="usecase-list">
+    <div class="usecase">
+      <div class="usecase-context">
+        <h4>&#128269; Understanding a pull request</h4>
+        <p>Your engineer says &ldquo;check the diff in the feature branch.&rdquo; You want to know what actually changed &mdash; in human terms.</p>
+      </div>
+      <div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">terminal</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="prompt">$ </span><span class="cmd">gh copilot suggest</span> <span class="str">"show git changes in a branch vs main"</span></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">terminal</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="prompt">$ </span><span class="cmd">gh copilot explain</span> <span class="str">"git diff main...feature/checkout --stat"</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="usecase">
+      <div class="usecase-context">
+        <h4>&#128027; Something broke in production</h4>
+        <p>You need to check logs or find when something changed &mdash; fast, without waiting for an engineer.</p>
+      </div>
+      <div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">terminal</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="prompt">$ </span><span class="cmd">gh copilot suggest</span> <span class="str">"search for error messages in a log file"</span></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">terminal</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="prompt">$ </span><span class="cmd">gh copilot suggest</span> <span class="str">"show git commits from the last 24 hours"</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="usecase">
+      <div class="usecase-context">
+        <h4>&#128202; Velocity check before sprint planning</h4>
+        <p>You want a quick picture of what shipped recently without opening Jira or chasing teammates.</p>
+      </div>
+      <div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">terminal</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="prompt">$ </span><span class="cmd">gh copilot suggest</span> <span class="str">"list merged pull requests in the last 2 weeks"</span></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">terminal</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="prompt">$ </span><span class="cmd">gh copilot suggest</span> <span class="str">"count git commits per author this month"</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="usecase">
+      <div class="usecase-context">
+        <h4>&#129309; Bridging the communication gap</h4>
+        <p>An engineer dropped a command in Slack. You want to understand it before the next call so you can ask a useful question.</p>
+      </div>
+      <div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">terminal</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="prompt">$ </span><span class="cmd">gh copilot explain</span> <span class="str">"docker compose up --build -d"</span></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">terminal</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="prompt">$ </span><span class="cmd">gh copilot explain</span> <span class="str">"kubectl rollout restart deployment/api"</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 6 -->
+<section class="section" id="cheatsheet" data-prog="6">
+  <div class="section-label">Step 6 &middot; Quick reference</div>
+  <h2>Cheatsheet &mdash; bookmark this</h2>
+  <p>Everything in one place. Come back here whenever you need a reminder.</p>
+
+  <div class="cheatsheet">
+    <div class="cheat-header">
+      <span>GitHub Copilot CLI &mdash; PM Quick Reference</span>
+      <button class="copy-btn" onclick="copyCheatsheet()">Copy all</button>
+    </div>
+    <div class="cheat-body">
+      <div class="cheat-row">
+        <div class="cheat-cmd">gh copilot suggest "..."</div>
+        <div class="cheat-desc">Turn a plain English description into a shell command</div>
+      </div>
+      <div class="cheat-row">
+        <div class="cheat-cmd">gh copilot explain "..."</div>
+        <div class="cheat-desc">Explain what a command or error message means</div>
+      </div>
+      <div class="cheat-row">
+        <div class="cheat-cmd">gh copilot --version</div>
+        <div class="cheat-desc">Check if Copilot CLI is installed and working</div>
+      </div>
+      <div class="cheat-row">
+        <div class="cheat-cmd">gh auth status</div>
+        <div class="cheat-desc">Check if you're logged into GitHub</div>
+      </div>
+      <div class="cheat-row">
+        <div class="cheat-cmd">gh auth login</div>
+        <div class="cheat-desc">Log in to your GitHub account (run once during setup)</div>
+      </div>
+      <div class="cheat-row">
+        <div class="cheat-cmd">gh extension upgrade copilot</div>
+        <div class="cheat-desc">Update Copilot CLI to the latest version</div>
+      </div>
+      <div class="cheat-row">
+        <div class="cheat-cmd">?? "..."</div>
+        <div class="cheat-desc">Shorthand for gh copilot suggest (after alias setup)</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:28px;">
+    <h3 style="font-size:16px; margin-bottom:16px;">Stuck or want to go deeper?</h3>
+    <div class="next-cards">
+      <div class="next-card">
+        <div class="next-card-icon">&#128218;</div>
+        <h4>Official docs</h4>
+        <p><a href="https://docs.github.com/en/copilot/github-copilot-in-the-cli" target="_blank">GitHub Copilot in the CLI</a> &mdash; the full reference directly from GitHub.</p>
+      </div>
+      <div class="next-card">
+        <div class="next-card-icon">&#128269;</div>
+        <h4>Google the error</h4>
+        <p>Most install issues are solved by searching the exact error message + your OS. Example: <em>&ldquo;gh command not found mac&rdquo;</em>.</p>
+      </div>
+      <div class="next-card">
+        <div class="next-card-icon">&#128172;</div>
+        <h4>Ask your engineers</h4>
+        <p>With Copilot CLI context you&rsquo;ll ask a much more specific question &mdash; and get a faster answer.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  Built as a hands-on introduction to GitHub Copilot CLI &middot;
+  <a href="https://docs.github.com/en/copilot/github-copilot-in-the-cli" target="_blank">Official docs &rarr;</a>
+</footer>
+
+<script>
+function jumpTo(id) {
+  document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+}
+
+function toggleStep(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+function switchTab(btn, panelId) {
+  var container = btn.closest('.step-body') || btn.closest('.section');
+  if (!container) return;
+  container.querySelectorAll('.itab').forEach(function(t) { t.classList.remove('active'); });
+  container.querySelectorAll('.itab-panel').forEach(function(p) { p.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById(panelId).classList.add('active');
+}
+
+function copyCode(btn) {
+  var pre = btn.closest('.code-block').querySelector('pre');
+  var text = pre.innerText.replace(/^\$ /gm, '').replace(/^> /gm, '').trim();
+  navigator.clipboard.writeText(text).then(function() {
+    var orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(function() { btn.textContent = orig; }, 1500);
+  });
+}
+
+function copyCheatsheet() {
+  var lines = Array.from(document.querySelectorAll('.cheat-row')).map(function(r) {
+    var cmd = r.querySelector('.cheat-cmd').innerText.trim();
+    var desc = r.querySelector('.cheat-desc').innerText.trim();
+    return cmd + '   # ' + desc;
+  }).join('\n');
+  navigator.clipboard.writeText(lines).then(function() { alert('Cheatsheet copied to clipboard!'); });
+}
+
+// Progress bar scroll tracking
+var sections = ['what','install','first-run','commands','usecases','cheatsheet'];
+var progSteps = document.querySelectorAll('.progress-step');
+var navSteps = document.querySelectorAll('.nav-step');
+
+var observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) {
+      var idx = sections.indexOf(entry.target.id);
+      if (idx === -1) return;
+      var n = idx + 1;
+      progSteps.forEach(function(s, i) {
+        s.classList.remove('active','done');
+        if (i + 1 < n) s.classList.add('done');
+        if (i + 1 === n) s.classList.add('active');
       });
-      navLinks.forEach(link => {
-        const isActive = link.getAttribute('href') === '#' + currentId;
-        link.classList.toggle('active', isActive);
+      navSteps.forEach(function(s, i) {
+        s.classList.toggle('active', i === idx);
       });
-    };
+    }
+  });
+}, { threshold: 0.25 });
 
-    const scenarioTabs = [...document.querySelectorAll('.scenario-tab')];
-    const scenarioPanels = [...document.querySelectorAll('.scenario-panel')];
-
-    const activateScenario = (targetId) => {
-      scenarioTabs.forEach(tab => {
-        const active = tab.dataset.target === targetId;
-        tab.classList.toggle('active', active);
-        tab.setAttribute('aria-selected', active ? 'true' : 'false');
-      });
-      scenarioPanels.forEach(panel => {
-        panel.classList.toggle('active', panel.id === targetId);
-      });
-    };
-
-    scenarioTabs.forEach(tab => {
-      tab.addEventListener('click', () => activateScenario(tab.dataset.target));
-    });
-
-    window.addEventListener('scroll', () => {
-      updateProgress();
-      activateNav();
-    }, { passive: true });
-
-    updateProgress();
-    activateNav();
-  </script>
+sections.forEach(function(id) {
+  var el = document.getElementById(id);
+  if (el) observer.observe(el);
+});
+</script>
 </body>
 </html>
